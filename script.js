@@ -127,6 +127,7 @@ $("#openCart").onclick=()=>toggleCart(true);
 $("#closeCart").onclick=$("#overlay").onclick=()=>toggleCart(false);
 document.addEventListener("keydown",e=>{if(e.key==="Escape")toggleCart(false)});
 $("#menuBtn").onclick=e=>{const o=$("#nav").classList.toggle("open");e.target.setAttribute("aria-expanded",o)};
+$("#nav").addEventListener("click",e=>{if(e.target.closest("a")){$("#nav").classList.remove("open");$("#menuBtn").setAttribute("aria-expanded",false)}});
 renderCart();
 
 // ---- home: featured products + portfolio teaser
