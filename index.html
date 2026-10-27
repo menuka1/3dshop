@@ -3,55 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>3DShop.lk – 3D Printing, Printers & Filament in Sri Lanka</title>
-<meta name="description" content="3D printing and design in Sri Lanka. Get a free quote, or shop 3D printers, filament, parts and electronics at 3DShop.lk.">
-<link rel="icon" href="logo.png">
+<title>3DShop.lk – 3D Printing & 3D Printers in Sri Lanka</title>
+<meta name="description" content="3D printing and design in Sri Lanka. Get a free quote for your part, or buy a 3D printer from 3DShop.lk.">
+<link rel="icon" href="images/logo-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&display=swap">
 <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body data-page="home">
 <a class="skip" href="#main">Skip to main content</a>
-
-<header class="header">
-  <div class="header-in">
-    <a class="brand" href="#top" aria-label="3DShop.lk home"><img src="logo.png" alt=""><span>3DShop<em>.lk</em></span></a>
-    <nav class="nav" id="nav" aria-label="Primary">
-      <a href="#top">Home</a><a href="#printing">Services</a><a href="#process">How it works</a><a href="#materials">Materials</a><a href="#shop">Shop</a><a href="#faq">FAQ</a>
-      <a class="btn small mobile-only" href="#custom">Get a free quote</a>
-    </nav>
-    <form class="search" id="searchForm" role="search">
-      <input id="searchInput" type="search" placeholder="Search products…" aria-label="Search products">
-      <button type="submit" aria-label="Search">Go</button>
-    </form>
-    <button class="cartbtn" id="openCart" aria-label="Open cart">Cart <b id="cartCount">0</b></button>
-    <a class="btn small desk-only" href="#custom">Get a free quote</a>
-    <button class="menubtn" id="menuBtn" aria-label="Menu" aria-expanded="false">Menu</button>
-  </div>
-</header>
+<div id="site-header"></div>
 
 <main id="main">
-  <section class="hero" id="top">
-    <div class="wrap hero-in">
+  <section class="hero">
+    <div class="wrap">
       <div class="hero-text">
         <p class="eyebrow">3D printing and design in Sri Lanka</p>
-        <h1>From idea to printed part.</h1>
-        <p class="lead">Send us a model, or let us design one. Asking for a quote costs nothing.</p>
+        <h1>From blueprint to real device.</h1>
+        <p class="lead">Send us a model, or let us design one. We print it, and we sell the 3D printers to do it yourself. A quote costs nothing.</p>
         <div class="cta">
-          <a class="btn" href="#custom">Get a free quote</a>
-          <a class="btn ghost" href="#custom" data-tab="design">Request 3D Design</a>
+          <a class="btn white" href="quote.html">Get a free quote</a>
+          <a class="btn ghost" href="shop.html">Shop 3D printers</a>
         </div>
       </div>
-      <div class="hero-art" aria-hidden="true">
-        <div class="ring"></div>
-        <div class="stack"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-        <div class="bed"></div>
+      <div class="hero-img"><img src="images/hero-cad-to-real.webp" alt="A CAD blueprint of an electronic device turning into the finished black 3D-printed device" width="1800" height="720" fetchpriority="high"></div>
+    </div>
+  </section>
+  <div class="hero-gap"></div>
+
+  <section class="section" style="padding-top:2rem">
+    <div class="wrap">
+      <div class="strip">
+        <div><b>Printed in Colombo</b><span>Enclosed FDM printers, down to 0.16 mm layers</span></div>
+        <div><b>Free quote</b><span>Price and lead time on WhatsApp</span></div>
+        <div><b>We design too</b><span>No model? Send a sketch or photo</span></div>
+        <div><b>3D printers for sale</b><span>With local support and set-up help</span></div>
       </div>
     </div>
   </section>
 
-  <section class="section" id="printing">
+  <section class="section cream" id="start">
     <div class="wrap">
       <h2>Where would you like to start?</h2>
       <div class="tabs" role="tablist" aria-label="How to start">
@@ -59,131 +51,53 @@
         <button role="tab" id="tab-design" aria-controls="panel-design" aria-selected="false" tabindex="-1">I need one designed</button>
       </div>
       <div class="panel" id="panel-model" role="tabpanel" aria-labelledby="tab-model">
-        <div class="panel-art"><span>CAD</span><i></i><span>PRINT</span></div>
+        <div class="panel-img"><img src="images/c-bracket.webp" alt="C-shaped bracket CAD blueprint beside the finished black print" width="1000" height="1000" loading="lazy"></div>
         <div class="panel-copy">
-          <p>Send us your STL, STEP or OBJ file, choose your material and print preferences, and we review it.</p>
+          <p>Send us your STL, STEP or OBJ file, choose your material and print preferences, and we review it and confirm the price.</p>
           <ul class="chips"><li>PLA</li><li>PETG</li><li>ABS</li><li>TPU</li></ul>
-          <p>Printed in Colombo on enclosed FDM printers, with layer heights down to 0.16 mm.</p>
-          <a class="btn" href="#custom">Get a free quote</a>
+          <a class="btn orange" href="quote.html">Get a free quote</a>
         </div>
       </div>
       <div class="panel" id="panel-design" role="tabpanel" aria-labelledby="tab-design" hidden>
-        <div class="panel-art"><span>IDEA</span><i></i><span>MODEL</span></div>
+        <div class="panel-img"><img src="images/robotic-arm.webp" alt="Hybrid robotic arm engineering blueprint with exploded assembly" width="1000" height="1000" loading="lazy"></div>
         <div class="panel-copy">
-          <p>No 3D model yet? Tell us what you need, with a sketch or photos if you have them, and we design it.</p>
-          <ul class="chips"><li>Sketch to CAD</li><li>Spare parts</li><li>Enclosures</li></ul>
-          <p>We confirm the design and the price on WhatsApp before anything is printed.</p>
-          <a class="btn" href="#custom">Request 3D Design</a>
+          <p>No 3D model yet? Tell us what you need, with a sketch or photos, and we design it from blueprint to printed part.</p>
+          <ul class="chips"><li>Sketch to CAD</li><li>Enclosures</li><li>Spare parts</li></ul>
+          <a class="btn orange" href="quote.html?type=design">Request 3D Design</a>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="section warm" id="shop">
+  <section class="section">
     <div class="wrap">
-      <div class="shop-top">
-        <p class="eyebrow dark">Shop</p>
-        <h2>3D printers, filament and parts in stock</h2>
-        <p class="sub">Genuine stock in Colombo. Pick a category, add to cart and order on WhatsApp.</p>
+      <div class="head-row">
+        <div><p class="eyebrow dark">Portfolio</p><h2>Things we have printed</h2></div>
+        <a class="btn ghost-dark" href="portfolio.html">See all projects</a>
       </div>
-      <div class="cats" id="cats"></div>
-      <div class="filters" id="filters" role="tablist" aria-label="Filter products"></div>
-      <div class="grid" id="grid"></div>
-      <p class="empty" id="empty" hidden>No products match that search. Try another word or pick All.</p>
+      <div class="gallery four" id="teaser"></div>
     </div>
   </section>
 
-  <section class="section" id="process">
+  <section class="section cream">
+    <div class="wrap">
+      <div class="head-row">
+        <div><p class="eyebrow dark">3D printers</p><h2>Buy a 3D printer</h2><p class="sub">Genuine stock with local support. Add to cart and order on WhatsApp.</p></div>
+        <a class="btn ghost-dark" href="shop.html">All 3D printers</a>
+      </div>
+      <div class="railwrap">
+        <button class="rarrow prev" aria-label="Scroll left" data-rail="featuredRail" data-dir="-1">‹</button>
+        <div class="rail" id="featuredRail"></div>
+        <button class="rarrow next" aria-label="Scroll right" data-rail="featuredRail" data-dir="1">›</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
     <div class="wrap">
       <h2>How it works</h2>
-      <ol class="steps">
-        <li><span class="num">1</span><h3>Send your model</h3><p>Share the 3D model you want us to review: STL, OBJ, 3MF or STEP.</p></li>
-        <li><span class="num">2</span><h3>Choose your preferences</h3><p>Select your preferred material, colour, layer height, infill and quantity.</p></li>
-        <li><span class="num">3</span><h3>Submit your request</h3><p>Add your contact details and send the request for review.</p></li>
-        <li><span class="num">4</span><h3>We contact you</h3><p>We confirm the price with you on WhatsApp, usually within one working day.</p></li>
-      </ol>
-      <a class="btn" href="#custom">Get a free quote</a>
-    </div>
-  </section>
-
-  <section class="section navy" id="applications">
-    <div class="wrap">
-      <p class="eyebrow">Applications</p>
-      <h2>Built for ideas that need to become real.</h2>
-      <p class="sub light">From first prototypes to practical custom parts, see where 3D printing can support your next project.</p>
-      <div class="apps">
-        <article><span>01</span><h3>Engineering &amp; Prototyping</h3><p>Prototypes, enclosures &amp; functional parts</p></article>
-        <article><span>02</span><h3>Product Design &amp; Startups</h3><p>Concepts into physical iterations</p></article>
-        <article><span>03</span><h3>Education &amp; Research</h3><p>Visualization, teaching &amp; research models</p></article>
-        <article><span>04</span><h3>Jigs, Fixtures &amp; Custom Parts</h3><p>Holders, guides &amp; practical components</p></article>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" id="materials">
-    <div class="wrap colour">
-      <div>
-        <h2>See it in your colour</h2>
-        <p class="sub">Choose PLA, PETG or ABS in white, black, blue or yellow when you send your quote request.</p>
-        <div class="swatches" id="swatches" role="radiogroup" aria-label="Colour">
-          <button role="radio" aria-checked="true" data-col="#f4f4f4" style="--c:#f4f4f4"><i></i>White</button>
-          <button role="radio" aria-checked="false" data-col="#1f2022" style="--c:#1f2022"><i></i>Black</button>
-          <button role="radio" aria-checked="false" data-col="#219cbc" style="--c:#219cbc"><i></i>Blue</button>
-          <button role="radio" aria-checked="false" data-col="#fdb713" style="--c:#fdb713"><i></i>Yellow</button>
-        </div>
-      </div>
-      <div class="cube-wrap" aria-hidden="true">
-        <div class="cube" id="cube"><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div><div class="face"></div></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section warm custom" id="custom">
-    <div class="wrap two">
-      <div>
-        <h2>Get a free quote</h2>
-        <p>Tell us what you need printed. We reply with a price and lead time, usually within one working day.</p>
-        <ul class="ticks">
-          <li>PLA, PETG, ABS, TPU and more</li>
-          <li>Prototypes, spares, gifts and small batches</li>
-          <li>Don't have a model? We can design it for you</li>
-        </ul>
-      </div>
-      <form class="quote" id="quoteForm">
-        <label>Name<input name="name" required autocomplete="name"></label>
-        <label>Phone or WhatsApp<input name="phone" required inputmode="tel" autocomplete="tel"></label>
-        <label>Material
-          <select name="material"><option>PLA</option><option>PETG</option><option>ABS</option><option>TPU</option><option>Not sure</option></select>
-        </label>
-        <label>What do you need printed or designed?<textarea name="details" rows="3" required></textarea></label>
-        <button class="btn" type="submit">Request quote</button>
-        <p class="note" id="quoteNote" role="status"></p>
-      </form>
-    </div>
-  </section>
-
-  <section class="section" id="why">
-    <div class="wrap">
-      <h2>Why work with us?</h2>
-      <div class="why">
-        <article><h3>We use what we sell</h3><p>Every printer and filament we stock has been tested on our own machines first.</p></article>
-        <article><h3>Your quote is reviewed by us</h3><p>We look at your model with the material, colour and quantity, then confirm the real price on WhatsApp.</p></article>
-        <article><h3>Local support</h3><p>Message us for slicer settings, upgrades and warranty claims. Prices are in rupees with no surprises.</p></article>
-      </div>
-    </div>
-  </section>
-
-  <section class="section warm" id="faq">
-    <div class="wrap narrow">
-      <h2>Frequently asked questions</h2>
-      <div class="faq">
-        <details><summary>I already have a 3D model. What happens next?</summary><p>Send the model with your material, colour and quantity. We review it, then contact you on WhatsApp with the confirmed price.</p></details>
-        <details><summary>I have an idea but no 3D model. Can you help?</summary><p>Yes. Choose Request 3D Design and tell us what you need, with sketches or photos if you have them. We discuss the design and price on WhatsApp before anything is printed.</p></details>
-        <details><summary>Which materials and colours can I choose?</summary><p>PLA, PETG, ABS and TPU. Colours are white, black, blue and yellow.</p></details>
-        <details><summary>Which file formats do you accept?</summary><p>STL, OBJ, 3MF and STEP. If you only have a sketch or photo, we can model it for you.</p></details>
-        <details><summary>How long does printing take?</summary><p>It depends on the size, settings and quantity. We tell you the print time together with the price.</p></details>
-        <details><summary>Do you deliver outside Colombo?</summary><p>Yes, island-wide by courier in 2 to 3 days, with cash on delivery available.</p></details>
-      </div>
+      <div id="how-steps"></div>
+      <div class="how-cta"><a class="btn orange" href="quote.html">Get a free quote</a></div>
     </div>
   </section>
 
@@ -191,33 +105,12 @@
     <div class="wrap">
       <h2>Send it over.</h2>
       <p>Tell us what you need printed and we will quote it today.</p>
-      <a class="btn yellow" href="#custom">Get a free quote</a>
+      <a class="btn white" href="quote.html">Get a free quote</a>
     </div>
   </section>
 </main>
 
-<footer class="footer" id="contact">
-  <div class="wrap">
-    <div class="fcols">
-      <div><a class="brand" href="#top"><img src="logo.png" alt=""><span>3DShop<em>.lk</em></span></a><p>3D printing supplies and services in Sri Lanka.</p></div>
-      <div><h4>Explore</h4><a href="#printing">Services</a><a href="#shop">Shop</a><a href="#process">How it works</a><a href="#faq">FAQ</a></div>
-      <div><h4>Contact</h4><a href="tel:+94770000000">+94 77 000 0000</a><a href="mailto:hello@3dshop.lk">hello@3dshop.lk</a><span>Colombo, Sri Lanka</span></div>
-    </div>
-    <p class="copy">© <span id="yr"></span> 3DShop.lk. All rights reserved.</p>
-  </div>
-</footer>
-
-<div class="overlay" id="overlay" hidden></div>
-<aside class="drawer" id="drawer" aria-label="Shopping cart" aria-hidden="true">
-  <div class="dhead"><h3>Your cart</h3><button id="closeCart" aria-label="Close cart">Close</button></div>
-  <div class="items" id="items"></div>
-  <div class="dfoot">
-    <div class="total"><span>Total</span><b id="total">Rs. 0</b></div>
-    <a class="btn full" id="checkout" href="#" target="_blank" rel="noopener">Order on WhatsApp</a>
-  </div>
-</aside>
-<a class="wa" id="waFloat" href="#" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">WhatsApp</a>
-<div class="toast" id="toast" role="status"></div>
+<div id="site-footer"></div>
 <script src="script.js"></script>
 </body>
 </html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Get a Free 3D Printing Quote – 3DShop.lk</title>
+<meta name="description" content="Request a free quote for 3D printing or 3D design in Sri Lanka. We reply on WhatsApp.">
+<link rel="icon" href="images/logo-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-page="quote">
+<a class="skip" href="#main">Skip to main content</a>
+<div id="site-header"></div>
+
+<main id="main">
+  <section class="page-hero">
+    <div class="wrap">
+      <p class="eyebrow">Quote</p>
+      <h1>Get a free quote</h1>
+      <p>Tell us what you need. We reply on WhatsApp with a price and lead time.</p>
+    </div>
+  </section>
+
+  <section class="section cream">
+    <div class="wrap two">
+      <div>
+        <h2>What happens next</h2>
+        <ul class="ticks">
+          <li>We review your request and model</li>
+          <li>We confirm the price on WhatsApp, usually within one working day</li>
+          <li>You attach your 3D file in the chat that opens</li>
+          <li>No model? We can design it for you</li>
+        </ul>
+        <div class="panel-img" style="margin-top:2rem"><img src="images/cup-holder.webp" alt="Cup holder organizer blueprint and finished print" width="1000" height="1000" loading="lazy"></div>
+      </div>
+      <form class="quote" id="quoteForm">
+        <label>I need
+          <select name="type" id="typeSel"><option value="Print my model">Print my model</option><option value="Design and print">Design and print</option></select>
+        </label>
+        <label>Name<input name="name" required autocomplete="name"></label>
+        <label>Phone or WhatsApp<input name="phone" required inputmode="tel" autocomplete="tel"></label>
+        <label>Material
+          <select name="material"><option>PLA</option><option>PETG</option><option>ABS</option><option>TPU</option><option>Not sure</option></select>
+        </label>
+        <label>Colour
+          <select name="colour"><option>White</option><option>Black</option><option>Red</option><option>Orange</option><option>Not sure</option></select>
+        </label>
+        <label>Describe your part<textarea name="details" rows="4" required placeholder="Size, quantity, what it is used for…"></textarea></label>
+        <button class="btn orange" type="submit">Request quote on WhatsApp</button>
+        <p class="note" id="quoteNote" role="status"></p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<div id="site-footer"></div>
+<script src="script.js"></script>
+<script>if(new URLSearchParams(location.search).get("type")==="design")document.getElementById("typeSel").value="Design and print";</script>
+</body>
+</html>

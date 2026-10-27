@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shop 3D Printers, Filament & Parts in Sri Lanka – 3DShop.lk</title>
+<meta name="description" content="Buy 3D printers, filament, resin, parts and scanners in Sri Lanka. Hot deals, new arrivals and island-wide delivery from 3DShop.lk.">
+<link rel="icon" href="images/logo-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-page="shop">
+<a class="skip" href="#main">Skip to main content</a>
+<div id="site-header"></div>
+
+<main id="main">
+  <!-- auto-scrolling promo slider -->
+  <section class="slider" id="slider" aria-roledescription="carousel" aria-label="Promotions">
+    <div class="slide on">
+      <div class="wrap slide-in">
+        <div class="slide-text">
+          <p class="eyebrow">Hot deals</p>
+          <h2>Up to 25% off 3D printers</h2>
+          <p>Limited-time prices on our best-selling FDM and resin printers.</p>
+          <a class="btn white" href="#hot">See hot deals</a>
+        </div>
+        <div class="slide-art" aria-hidden="true"><svg viewBox="0 0 64 64"><rect x="8" y="6" width="48" height="52" rx="4"/><path d="M8 16h48M20 16v20M44 16v20M20 30h24"/><rect x="24" y="30" width="16" height="6"/><path d="M14 50h36"/></svg></div>
+      </div>
+    </div>
+    <div class="slide">
+      <div class="wrap slide-in">
+        <div class="slide-text">
+          <p class="eyebrow">New arrivals</p>
+          <h2>Fresh in: resin printers, PLA+ and scanners</h2>
+          <p>Be the first to get the latest 3D printing gear in Sri Lanka.</p>
+          <a class="btn white" href="#new">Shop new arrivals</a>
+        </div>
+        <div class="slide-art" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M32 6l7 16 17 2-13 12 4 17-15-9-15 9 4-17L8 24l17-2z"/></svg></div>
+      </div>
+    </div>
+    <div class="slide dark">
+      <div class="wrap slide-in">
+        <div class="slide-text">
+          <p class="eyebrow">Filament</p>
+          <h2>Stock up on PLA, PETG and ABS</h2>
+          <p>1 kg spools in popular colours, with discounts on selected rolls.</p>
+          <a class="btn orange" href="#all" data-go-cat="Filaments">Shop filament</a>
+        </div>
+        <div class="slide-art" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="24"/><circle cx="32" cy="32" r="8"/><path d="M12 22c8 4 32 4 40 0M12 42c8-4 32-4 40 0"/></svg></div>
+      </div>
+    </div>
+    <div class="slide">
+      <div class="wrap slide-in">
+        <div class="slide-text">
+          <p class="eyebrow">No printer? No problem.</p>
+          <h2>We print it for you</h2>
+          <p>Send a model or an idea and get a free quote on WhatsApp.</p>
+          <a class="btn white" href="quote.html">Get a free quote</a>
+        </div>
+        <div class="slide-photo"><img src="images/robotic-arm.webp" alt="Robotic arm blueprint and finished 3D print" width="1000" height="1000"></div>
+      </div>
+    </div>
+    <button class="sl-arrow prev" id="slPrev" aria-label="Previous slide">‹</button>
+    <button class="sl-arrow next" id="slNext" aria-label="Next slide">›</button>
+    <div class="dots" id="dots"></div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap">
+      <div class="strip">
+        <div><b>Island-wide delivery</b><span>Courier in 2–3 days</span></div>
+        <div><b>Genuine stock</b><span>Local warranty on printers</span></div>
+        <div><b>Cash on delivery</b><span>Or bank transfer</span></div>
+        <div><b>Set-up help</b><span>Support on WhatsApp</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap">
+      <h2 class="h-sm">Shop by category</h2>
+      <div class="cat-tiles" id="catTiles"></div>
+    </div>
+  </section>
+
+  <section class="section cream" id="hot">
+    <div class="wrap">
+      <div class="head-row">
+        <div>
+          <p class="eyebrow dark">Hot deals</p>
+          <h2>Flash sale</h2>
+        </div>
+        <div class="countdown" id="countdownBox" hidden>Ends in <b id="countdown"></b></div>
+      </div>
+      <div class="railwrap">
+        <button class="rarrow prev" aria-label="Scroll left" data-rail="hotRail" data-dir="-1">‹</button>
+        <div class="rail" id="hotRail"></div>
+        <button class="rarrow next" aria-label="Scroll right" data-rail="hotRail" data-dir="1">›</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="new">
+    <div class="wrap">
+      <div class="head-row">
+        <div>
+          <p class="eyebrow dark">New arrivals</p>
+          <h2>Just landed</h2>
+        </div>
+      </div>
+      <div class="railwrap">
+        <button class="rarrow prev" aria-label="Scroll left" data-rail="newRail" data-dir="-1">‹</button>
+        <div class="rail" id="newRail"></div>
+        <button class="rarrow next" aria-label="Scroll right" data-rail="newRail" data-dir="1">›</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section cream" id="all">
+    <div class="wrap">
+      <div class="head-row">
+        <div><p class="eyebrow dark">All products</p><h2>Browse the shop</h2></div>
+        <form class="search" id="searchForm" role="search">
+          <input id="searchInput" type="search" placeholder="Search products…" aria-label="Search products">
+          <button type="submit">Search</button>
+        </form>
+      </div>
+      <div class="shop-layout">
+        <aside class="sidebar" aria-label="Categories">
+          <h3>Categories</h3>
+          <div id="sideCats"></div>
+        </aside>
+        <div>
+          <div class="toolbar">
+            <div class="filters" id="tabs" role="tablist" aria-label="Product lists"></div>
+            <label class="sort">Sort
+              <select id="sort">
+                <option value="feat">Featured</option>
+                <option value="low">Price: low to high</option>
+                <option value="high">Price: high to low</option>
+                <option value="disc">Biggest discount</option>
+                <option value="name">Name A–Z</option>
+              </select>
+            </label>
+          </div>
+          <p class="count" id="count" role="status"></p>
+          <div class="grid" id="grid"></div>
+          <p class="empty" id="empty" hidden>No products match. Try another word or category.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <h2>Why buy from 3DShop.lk</h2>
+      <div class="why">
+        <article><h3>We print for a living</h3><p>We run 3D printers every day, so we know which ones work.</p></article>
+        <article><h3>Prices in rupees</h3><p>The price you see is the price you pay. Delivery is confirmed when you order.</p></article>
+        <article><h3>Local support</h3><p>Message us on WhatsApp for set-up, slicer settings and warranty claims.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-band">
+    <div class="wrap">
+      <h2>Cannot find what you need?</h2>
+      <p>Tell us what you are looking for and we will source it.</p>
+      <a class="btn white" data-wa href="#" target="_blank" rel="noopener">Ask on WhatsApp</a>
+    </div>
+  </section>
+</main>
+
+<div id="site-footer"></div>
+<script src="script.js"></script>
+</body>
+</html>
