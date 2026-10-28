@@ -397,3 +397,28 @@ body{overflow-x:hidden}
  .shop-layout{grid-template-columns:minmax(0,1fr)}
  .filters,#sideCats{max-width:100%}
 }
+
+/* ---- modern header icons + product photos ---- */
+.header .cartbtn{position:relative;display:inline-grid;place-items:center;width:46px;height:46px;padding:0;border:2px solid var(--line);border-radius:14px;background:#fff;color:var(--ink);transition:border-color .18s,transform .18s}
+.header .cartbtn:hover{border-color:var(--o1);transform:translateY(-1px)}
+.header .cartbtn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.header .cartbtn b{position:absolute;top:-7px;right:-7px;min-width:21px;height:21px;margin:0;padding:0 .3rem;display:grid;place-items:center;font-size:.72rem;line-height:1;border:2px solid #fff}
+.header .menubtn{width:46px;height:46px;padding:0;border:0;border-radius:14px;background:var(--grad);box-shadow:0 6px 16px rgba(242,111,33,.35);place-items:center}
+.menubtn .bars{position:relative;display:block;width:22px;height:16px}
+.menubtn .bars i{position:absolute;left:0;height:2.5px;background:#fff;border-radius:2px;transition:transform .3s cubic-bezier(.77,0,.175,1),opacity .2s,width .3s,top .3s}
+.menubtn .bars i:nth-child(1){top:0;width:22px}
+.menubtn .bars i:nth-child(2){top:6.75px;width:15px}
+.menubtn .bars i:nth-child(3){top:13.5px;width:22px}
+.menubtn[aria-expanded=true] .bars i:nth-child(1){top:6.75px;transform:rotate(45deg)}
+.menubtn[aria-expanded=true] .bars i:nth-child(2){opacity:0;width:0}
+.menubtn[aria-expanded=true] .bars i:nth-child(3){top:6.75px;transform:rotate(-45deg)}
+.menubtn:active{transform:scale(.94)}
+@media(max-width:900px){
+ .header .menubtn{display:grid}
+ .nav.open{animation:navdrop .28s cubic-bezier(.23,1,.32,1)}
+ .nav a:not(.btn)[aria-current=page]{color:var(--o-dark);border-bottom-color:var(--o1)}
+}
+@keyframes navdrop{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+.thumb.has-img{background:#fff;padding:.5rem}
+.thumb.has-img img{width:100%;height:100%;object-fit:contain}
+@media(min-width:901px){.slide-in{padding-left:4.2rem;padding-right:4.2rem}}

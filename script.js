@@ -15,6 +15,7 @@ const CATS = {
 };
 // tags: "hot" = Hot deals, "new" = New arrivals, "best" = Best seller. stock: "in" | "out" | "pre"
 // old = previous price (shows the discount). Keep ids unique and do not reuse old ids.
+// img = photo file name inside images/products/ (for example img:"ender-3.webp"). Without img, a category icon is shown.
 const PRODUCTS = [
   {id:1,name:"Ender-style FDM 3D Printer",cat:"3D Printers",sub:"FDM",price:89900,old:99900,tags:["hot","best"],stock:"in",desc:"Reliable all-rounder for beginners and makers."},
   {id:2,name:"Enclosed Core-XY Printer",cat:"3D Printers",sub:"FDM",price:249000,tags:["best"],stock:"in",desc:"Fast, enclosed and ready for PETG and ABS."},
@@ -67,9 +68,9 @@ const pct=p=>p.old?Math.round((p.old-p.price)/p.old*100):0;
 $("#site-header").outerHTML=`<header class="header"><div class="header-in">
   <a class="brand" href="index.html" aria-label="3DShop.lk home"><img src="images/logo-192.png" alt=""><span>3DShop<em>.lk</em></span></a>
   <nav class="nav" id="nav" aria-label="Primary">${NAV.map(n=>`<a href="${n[0]}"${n[2]===page?' aria-current="page"':""}>${n[1]}</a>`).join("")}<a class="btn small mobile-only" href="quote.html">Get a free quote</a></nav>
-  <button class="cartbtn" id="openCart" aria-label="Open cart">Cart <b id="cartCount">0</b></button>
+  <button class="cartbtn" id="openCart" aria-label="Open cart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2.2l2.1 10.2a1.5 1.5 0 0 0 1.5 1.2h8.1a1.5 1.5 0 0 0 1.5-1.1L20 8H6.2"/><circle cx="9.5" cy="19.5" r="1.4"/><circle cx="17" cy="19.5" r="1.4"/></svg><b id="cartCount">0</b></button>
   <a class="btn small desk-only" href="quote.html">Get a free quote</a>
-  <button class="menubtn" id="menuBtn" aria-label="Menu" aria-expanded="false">Menu</button>
+  <button class="menubtn" id="menuBtn" aria-label="Menu" aria-expanded="false" aria-controls="nav"><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span></button>
 </div></header>`;
 $("#site-footer").outerHTML=`<footer class="footer"><div class="wrap">
   <div class="fcols">
@@ -109,7 +110,7 @@ function renderCart(){
 const toggleCart=o=>{$("#drawer").classList.toggle("open",o);$("#drawer").setAttribute("aria-hidden",!o);$("#overlay").hidden=!o};
 const change=(id,d)=>{const i=cart.find(x=>x.id===id);if(!i)return;i.q+=d;if(i.q<1)cart=cart.filter(x=>x.id!==id);renderCart()};
 const STOCK={in:"In stock",out:"Out of stock",pre:"Pre-order"};
-const card=p=>{const d=pct(p);return `<article class="card"><div class="thumb">${ICONS[p.cat]}
+const card=p=>{const d=pct(p);return `<article class="card"><div class="thumb${p.img?" has-img":""}">${p.img?`<img src="images/products/${p.img}" alt="${p.name}" loading="lazy" width="600" height="600">`:ICONS[p.cat]}
   <div class="badges">${p.tags.includes("new")?'<span class="bdg new">New</span>':""}${d?`<span class="bdg sale">-${d}%</span>`:""}${p.tags.includes("best")?'<span class="bdg best">Best seller</span>':""}</div></div>
   <div class="body"><small>${p.cat}${p.sub?" › "+p.sub:""}</small><h3>${p.name}</h3><p>${p.desc}</p>
   <span class="stock ${p.stock}">${STOCK[p.stock]}</span>
@@ -127,7 +128,10 @@ $("#openCart").onclick=()=>toggleCart(true);
 $("#closeCart").onclick=$("#overlay").onclick=()=>toggleCart(false);
 document.addEventListener("keydown",e=>{if(e.key==="Escape")toggleCart(false)});
 $("#menuBtn").onclick=e=>{const o=$("#nav").classList.toggle("open");e.target.setAttribute("aria-expanded",o)};
-$("#nav").addEventListener("click",e=>{if(e.target.closest("a")){$("#nav").classList.remove("open");$("#menuBtn").setAttribute("aria-expanded",false)}});
+const closeMenu=()=>{$("#nav").classList.remove("open");$("#menuBtn").setAttribute("aria-expanded",false)};
+$("#nav").addEventListener("click",e=>{if(e.target.closest("a"))closeMenu()});
+document.addEventListener("click",e=>{if(!e.target.closest(".header-in"))closeMenu()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeMenu()});
 renderCart();
 
 // ---- home: featured products + portfolio teaser
