@@ -110,16 +110,22 @@ function renderCart(){
 const toggleCart=o=>{$("#drawer").classList.toggle("open",o);$("#drawer").setAttribute("aria-hidden",!o);$("#overlay").hidden=!o};
 const change=(id,d)=>{const i=cart.find(x=>x.id===id);if(!i)return;i.q+=d;if(i.q<1)cart=cart.filter(x=>x.id!==id);renderCart()};
 const STOCK={in:"In stock",out:"Out of stock",pre:"Pre-order"};
-const card=p=>{const d=pct(p);return `<article class="card"><div class="thumb${p.img?" has-img":""}">${p.img?`<img src="images/products/${p.img}" alt="${p.name}" loading="lazy" width="600" height="600">`:ICONS[p.cat]}
-  <div class="badges">${p.tags.includes("new")?'<span class="bdg new">New</span>':""}${d?`<span class="bdg sale">-${d}%</span>`:""}${p.tags.includes("best")?'<span class="bdg best">Best seller</span>':""}</div></div>
-  <div class="body"><small>${p.cat}${p.sub?" › "+p.sub:""}</small><h3>${p.name}</h3><p>${p.desc}</p>
-  <span class="stock ${p.stock}">${STOCK[p.stock]}</span>
-  <div class="price">${fmt(p.price)}${p.old?`<s>${fmt(p.old)}</s>`:""}</div>
+// Daraz-style card. Optional per-product fields: rating (0-5), reviews (count), sold (count), free (true = "Free delivery")
+const stars=r=>{const f=Math.round(r*2)/2;return [1,2,3,4,5].map(i=>`<i class="${f>=i?"full":f>=i-.5?"half":""}"></i>`).join("")};
+const card=p=>{const d=pct(p);const k=n=>n>=1000?(n/1000).toFixed(1).replace(".0","")+"K":n;
+  return `<article class="card"><div class="thumb${p.img?" has-img":""}">${p.img?`<img src="images/products/${p.img}" alt="${p.name}" loading="lazy" width="600" height="600">`:ICONS[p.cat]}
+  ${p.tags.includes("new")||p.tags.includes("best")?`<span class="ribbon${p.tags.includes("new")?"":" best"}">${p.tags.includes("new")?"New":"Best seller"}</span>`:""}
+  ${d?`<span class="off">-${d}%</span>`:""}</div>
+  <div class="body"><h3>${p.name}</h3>
+  <div class="price">${fmt(p.price)}</div>
+  ${p.old?`<div class="was"><s>${fmt(p.old)}</s><b>-${d}%</b></div>`:""}
+  ${p.rating?`<div class="rate"><span class="stars" aria-label="${p.rating} out of 5">${stars(p.rating)}</span>${p.reviews?`<em>(${k(p.reviews)})</em>`:""}${p.sold?`<span class="sold">${k(p.sold)} sold</span>`:""}</div>`:""}
+  ${p.stock!=="in"?`<span class="stock ${p.stock}">${STOCK[p.stock]}</span>`:p.free?'<span class="stock in">Free delivery</span>':""}
   <button data-add="${p.id}"${p.stock==="out"?" disabled":""}>${p.stock==="out"?"Out of stock":p.stock==="pre"?"Pre-order":"Add to cart"}</button></div></article>`};
 
 document.addEventListener("click",e=>{
   const t=e.target.closest("button");if(!t)return;const d=t.dataset;
-  if(d.add){const id=+d.add,i=cart.find(x=>x.id===id);i?i.q++:cart.push({id,q:1});renderCart();toast("Added to cart")}
+  if(d.add){const id=+d.add,i=cart.find(x=>x.id===id);i?i.q++:cart.push({id,q:1});renderCart();toast("Added to cart");const cb=$("#cartCount");cb.classList.remove("bump");void cb.offsetWidth;cb.classList.add("bump");t.classList.add("added");setTimeout(()=>t.classList.remove("added"),900)}
   else if(d.inc)change(+d.inc,1); else if(d.dec)change(+d.dec,-1);
   else if(d.rm){cart=cart.filter(x=>x.id!==+d.rm);renderCart()}
 });
@@ -268,3 +274,20 @@ if($("#quoteForm"))$("#quoteForm").onsubmit=e=>{e.preventDefault();const f=Objec
 $$("[data-phone]").forEach(a=>{a.textContent=PHONE;a.href="tel:"+PHONE.replace(/\s/g,"")});
 $$("[data-email]").forEach(a=>{a.textContent=EMAIL;a.href="mailto:"+EMAIL});
 $$("[data-wa]").forEach(a=>a.href=`https://wa.me/${WHATSAPP}`);
+
+// ---- motion: scroll reveal, header shadow, hero parallax
+(()=>{
+  const hdr=$(".header");
+  const onScroll=()=>{hdr.classList.toggle("scrolled",scrollY>8)};
+  addEventListener("scroll",onScroll,{passive:true});onScroll();
+  if(reduced||!("IntersectionObserver" in window))return;
+  const sel=".section .head-row,.section>.wrap>h2,.section>.wrap>.h-sm,.strip>div,.cat-tile,.work,.panel,.tabs,.why article,.steps li,.svc article,.cards3 article,.apps article,.faq details,.quote,.two>*,.colour>*,.cta-band .wrap>*,.sidebar,.toolbar";
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}}),{threshold:.12,rootMargin:"0px 0px -40px 0px"});
+  $$(sel).forEach(el=>{
+    const sibs=[...el.parentElement.children].filter(c=>c.matches(sel));
+    el.style.setProperty("--d",Math.min(sibs.indexOf(el),6)*70+"ms");
+    el.classList.add("reveal");io.observe(el);
+  });
+  const hi=$(".hero-img");
+  if(hi&&matchMedia("(min-width:901px)").matches)addEventListener("scroll",()=>{hi.style.setProperty("--py",Math.min(scrollY,400)*-.06+"px")},{passive:true});
+})();
