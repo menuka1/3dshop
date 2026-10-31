@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Instant 3D Print Price – Upload your STL | 3DShop.lk</title>
+<meta name="description" content="Upload your STL file and see the 3D printing price in rupees instantly. Choose material, colour and quantity, then order on WhatsApp.">
+<link rel="icon" href="images/logo-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="style.css?v=quote-dialog-2">
+</head>
+<body data-page="instant">
+<a class="skip" href="#main">Skip to main content</a>
+<div id="site-header"></div>
+
+<main id="main">
+  <section class="page-hero">
+    <div class="wrap">
+      <p class="eyebrow">Local STL estimate</p>
+      <h1>Estimate your 3D print.</h1>
+      <p>Add one or more STL files, inspect the model, and get a planning range in Sri Lankan rupees.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap estimate-layout">
+      <div class="estimate-main">
+        <section class="iq-step">
+          <h2 class="h-sm">1. Add STL files</h2>
+          <div class="est-drop" id="dropZone">
+            <input type="file" id="stlFiles" accept=".stl,model/stl" multiple hidden>
+            <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 8l20 11v22L32 52 12 41V19z"/><path d="M12 19l20 11 20-11M32 30v22"/></svg>
+            <b>Drop STL files here or browse</b>
+            <span>Up to 10 files, 50 MB each; 100 MB total</span>
+            <div class="est-actions">
+              <button class="btn orange" type="button" id="browseFiles">Add files</button>
+              <button class="btn ghost-dark" type="button" id="clearFiles" disabled>Clear all</button>
+            </div>
+          </div>
+          <p class="est-status" id="estimateStatus" role="status">STL files are analyzed locally in this browser.</p>
+        </section>
+
+        <section class="iq-step">
+          <div class="est-viewer-head">
+            <div><h2 class="h-sm">Model preview</h2><p id="currentFileName">No STL loaded</p></div>
+            <div class="est-viewer-controls">
+              <button class="est-icon-btn" type="button" id="previousPart" aria-label="Previous file" title="Previous file">‹</button>
+              <button class="est-icon-btn" type="button" id="nextPart" aria-label="Next file" title="Next file">›</button>
+              <button class="est-text-btn" type="button" id="resetView">Reset view</button>
+              <button class="est-text-btn" type="button" id="removeCurrent" disabled>Remove file</button>
+            </div>
+          </div>
+          <div class="est-canvas-wrap"><canvas id="stlCanvas" aria-label="Interactive 3D model preview"></canvas></div>
+          <p class="est-viewer-status" id="viewerStatus">Add an STL file to preview it here.</p>
+        </section>
+
+        <section class="iq-step">
+          <h2 class="h-sm">Files in this estimate</h2>
+          <ul class="estimate-parts" id="partList" aria-live="polite"></ul>
+        </section>
+      </div>
+
+      <aside class="estimate-side" aria-live="polite">
+        <section class="iq-step">
+          <h2 class="h-sm">2. Print options</h2>
+          <div class="est-options">
+            <label for="units">STL units <select id="units"><option value="mm">Millimeters</option><option value="in">Inches</option></select></label>
+            <label for="material">Material <select id="material"></select></label>
+            <label for="quantity">Quantity per file <input id="quantity" type="number" min="1" max="1000" value="1" inputmode="numeric"></label>
+          </div>
+          <p class="est-hint">STL files do not store units. Choose the units used when the model was exported.</p>
+        </section>
+
+        <section class="iq-price est-price" aria-live="polite">
+          <p class="iq-label">Estimated job range</p>
+          <div class="est-amount" id="jobRange">-</div>
+          <p class="iq-sub" id="partRange">Add an STL to see a per-part estimate.</p>
+          <dl class="est-stats">
+            <div><dt>Dimensions</dt><dd id="dimensions">-</dd></div>
+            <div><dt>Mesh volume</dt><dd id="volume">-</dd></div>
+            <div><dt>Surface area</dt><dd id="surfaceArea">-</dd></div>
+            <div><dt>Estimated weight</dt><dd id="weight">-</dd></div>
+            <div><dt>Estimated print time</dt><dd id="estimatedPrintTime">-</dd></div>
+          </dl>
+          <p class="est-disclaimer" id="estimateNote">Planning estimate only. Actual material use depends on slicer settings and final review. Delivery is not included.</p>
+          <div class="est-actions est-quote-actions">
+            <button class="btn ghost-dark" type="button" id="copyEstimate" disabled>Copy estimate</button>
+            <button class="btn orange" type="button" id="requestQuote" disabled>Request final quote</button>
+          </div>
+          <p class="est-request-result" id="quoteRequestResult" role="status" hidden></p>
+        </section>
+      </aside>
+    </div>
+  </section>
+</main>
+
+<dialog class="estimate-dialog" id="quoteRequestDialog" aria-labelledby="quoteRequestHeading">
+  <form id="estimateRequestForm">
+    <div class="est-dialog-head">
+      <div><h2 id="quoteRequestHeading">Request a final quote</h2><p id="dialogEstimateSummary"></p></div>
+      <button class="est-text-btn" type="button" id="closeQuoteRequest">Close</button>
+    </div>
+    <label>Name<input name="name" required maxlength="120" autocomplete="name"></label>
+    <label>WhatsApp number<input name="phone" required maxlength="60" inputmode="tel" autocomplete="tel"></label>
+    <p class="est-dialog-status" id="quoteRequestStatus" role="status"></p>
+    <div class="est-actions est-dialog-actions">
+      <button class="btn ghost-dark" type="button" id="cancelQuoteRequest">Cancel</button>
+      <button class="btn orange" type="submit" id="sendQuoteRequest">Send request</button>
+    </div>
+  </form>
+</dialog>
+
+<div id="site-footer"></div>
+<script src="script.js?v=business-contact-1"></script>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.180.0/build/three.module.js"}}</script>
+<script type="module" src="stl-estimate.js?v=stl-estimate-7"></script>
+</body>
+</html>

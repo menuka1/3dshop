@@ -49,7 +49,11 @@
           <select name="colour"><option>White</option><option>Black</option><option>Red</option><option>Orange</option><option>Not sure</option></select>
         </label>
         <label>Describe your part<textarea name="details" rows="4" required placeholder="Size, quantity, what it is used for…"></textarea></label>
-        <button class="btn orange" type="submit">Request quote on WhatsApp</button>
+        <label>Attach model or reference files (optional)
+          <input type="file" name="files" multiple accept=".stl,.obj,.3mf,.step,.stp,.pdf,.png,.jpg,.jpeg,.webp">
+          <small>STL, OBJ, 3MF, STEP, PDF, PNG, JPG or WEBP. Up to 5 files, 50 MB each; 100 MB total.</small>
+        </label>
+        <button class="btn orange" type="submit">Submit quote request</button>
         <p class="note" id="quoteNote" role="status"></p>
       </form>
     </div>
@@ -57,7 +61,12 @@
 </main>
 
 <div id="site-footer"></div>
-<script src="script.js"></script>
-<script>if(new URLSearchParams(location.search).get("type")==="design")document.getElementById("typeSel").value="Design and print";</script>
+<script src="script.js?v=business-contact-1"></script>
+<script>
+const quoteParams = new URLSearchParams(location.search);
+if (quoteParams.get("type") === "design") document.getElementById("typeSel").value = "Design and print";
+const estimateText = quoteParams.get("estimate");
+if (estimateText) document.querySelector('#quoteForm [name="details"]').value = estimateText;
+</script>
 </body>
 </html>

@@ -1,0 +1,4 @@
+server/config.properties
+server/keys/
+server/data/
+*.log

@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>3DShop.lk – Admin</title>
+<style>
+:root{--o1:#F26F21;--o2:#F7931E;--ink:#1d1a17;--muted:#6b645d;--line:#eadfd5;--cream:#fbf4ee}
+*{box-sizing:border-box;margin:0}
+body{font:16px/1.5 Arial,Helvetica,sans-serif;color:var(--ink);background:var(--cream)}
+header{background:var(--ink);color:#fff;padding:.9rem 1.2rem;display:flex;align-items:center;gap:1rem}
+header b{font-size:1.15rem}header em{font-style:normal;color:var(--o2)}
+header button{margin-left:auto}
+main{max-width:980px;margin:0 auto;padding:1.4rem 1rem 4rem}
+h2{font-size:1.15rem;margin:0 0 .8rem}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:1.2rem;margin-bottom:1.2rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+label{display:grid;gap:.25rem;font-weight:700;font-size:.9rem}
+label small{font-weight:400;color:var(--muted)}
+input[type=number],input[type=text],input[type=password],textarea{font:inherit;padding:.55rem .6rem;border:2px solid var(--line);border-radius:8px;width:100%}
+input:focus,textarea:focus{outline:0;border-color:var(--o1)}
+textarea{min-height:70px;resize:vertical}
+button{font:700 .95rem Arial;border:0;border-radius:8px;padding:.6rem 1.1rem;cursor:pointer;background:var(--ink);color:#fff}
+button.go{background:linear-gradient(100deg,#F26F21,#F7931E)}
+button.ghost{background:#fff;color:var(--ink);border:2px solid var(--line)}
+.row{display:flex;gap:.7rem;align-items:center;flex-wrap:wrap}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th,td{text-align:left;padding:.45rem .5rem;border-bottom:1px solid var(--line);vertical-align:middle}
+th{color:var(--muted);font-size:.8rem;text-transform:uppercase;letter-spacing:.04em}
+td input[type=number]{width:90px;padding:.3rem .4rem}
+.msg{font-weight:700;min-height:1.4em}.msg.ok{color:#1b8a4b}.msg.bad{color:#c62828}
+.toggle{display:flex;gap:.6rem;align-items:center;font-weight:700}
+.toggle input{width:20px;height:20px}
+.preview{background:var(--cream);border-radius:8px;padding:.8rem 1rem;margin-top:1rem;font-size:.95rem}
+#login{max-width:340px;margin:12vh auto}
+.scroll{overflow-x:auto}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<header><b>3DShop<em>.lk</em> admin</b><button id="logout" class="ghost" hidden>Log out</button></header>
+
+<div id="login" class="card">
+  <h2>Admin login</h2>
+  <form id="loginForm" class="grid" style="grid-template-columns:1fr">
+    <label>Password<input type="password" id="pw" autocomplete="current-password" required></label>
+    <button class="go">Log in</button>
+    <p class="msg bad" id="loginMsg"></p>
+  </form>
+</div>
+
+<main id="app" hidden>
+  <div class="card">
+    <h2>Instant quote pricing</h2>
+    <label class="toggle"><input type="checkbox" id="quotesEnabled"> Online quotes switched on</label>
+    <div class="grid" style="margin-top:1rem">
+      <label>USD → LKR rate<small>Applied to the supplier price</small><input type="number" step="0.01" id="usdToLkr"></label>
+      <label>Markup %<small>Your margin on top of the supplier price</small><input type="number" step="0.1" id="markupPercent"></label>
+      <label>Handling fee (Rs.)<small>Added to every quote</small><input type="number" id="fixedFeeLkr"></label>
+      <label>Shipping (Rs.)<small>Flat amount added once per quote</small><input type="number" id="flatShippingLkr"></label>
+      <label>Minimum order (Rs.)<small>Quotes never go below this</small><input type="number" id="minOrderLkr"></label>
+      <label>Round to nearest (Rs.)<small>e.g. 10 or 50</small><input type="number" id="roundToLkr"></label>
+    </div>
+    <div class="preview" id="preview"></div>
+  </div>
+
+  <div class="card">
+    <h2>STL estimator pricing</h2>
+    <p style="color:var(--muted);font-size:.9rem;margin-bottom:.9rem">These rates stay private in the admin panel. Printer cost is the average of the three machine and electricity totals in your sheet (Rs. 2.51/min). Set a measured material throughput to enable estimates.</p>
+    <h3 style="font-size:1rem;margin-bottom:.6rem">Material cost per gram (Rs.)</h3>
+    <div class="grid">
+      <label>PLA+<input type="number" min="0" step="0.01" id="costPlaPlus"></label>
+      <label>ABS+<input type="number" min="0" step="0.01" id="costAbsPlus"></label>
+      <label>TPU<input type="number" min="0" step="0.01" id="costTpu"></label>
+      <label>PETG<input type="number" min="0" step="0.01" id="costPetg"></label>
+      <label>ASA<input type="number" min="0" step="0.01" id="costAsa"></label>
+    </div>
+    <h3 style="font-size:1rem;margin:1.2rem 0 .6rem">Shared printer rate</h3>
+    <div class="grid">
+      <label>Average printer + electricity cost (Rs./min)<input type="number" min="0" step="0.01" id="printerCostLkrPerMinute"></label>
+      <label>Estimated material throughput (cm³/min)<small>Required for automatic print-time estimates</small><input type="number" min="0" step="0.01" id="estimatorPrintVolumeCm3PerMinute"></label>
+    </div>
+    <h3 style="font-size:1rem;margin:1.2rem 0 .6rem">Margins, labor and job fees</h3>
+    <div class="grid">
+      <label>Printing margin multiplier<input type="number" min="0" step="0.01" id="printingMargin"></label>
+      <label>Fastener margin multiplier<input type="number" min="0" step="0.01" id="fastenerMargin"></label>
+      <label>Fastener cost per part (Rs.)<small>0 when not applicable</small><input type="number" min="0" step="0.01" id="fastenerCostLkrPerPart"></label>
+      <label>Monthly salary (Rs.)<input type="number" min="0" step="1" id="labourMonthlySalaryLkr"></label>
+      <label>Labor cost per minute (Rs.)<input type="number" min="0" step="0.01" id="labourCostLkrPerMinute"></label>
+      <label>Estimator setup fee (Rs.)<input type="number" min="0" step="1" id="estimatorSetupFeeLkr"></label>
+      <label>Estimator minimum job (Rs.)<input type="number" min="0" step="1" id="estimatorMinJobLkr"></label>
+      <label>Estimator rounding (Rs.)<input type="number" min="1" step="1" id="estimatorRoundToLkr"></label>
+    </div>
+    <div class="preview" id="estimatorPreview"></div>
+  </div>
+
+  <div class="card">
+    <div class="row"><h2 style="margin:0">Shop categories</h2><button class="ghost" type="button" id="reloadShopCatalog">Reload catalog</button><button class="ghost" type="button" id="resetCategoryForm">New category</button><span class="msg" id="shopCatalogMsg"></span></div>
+    <p style="color:var(--muted);font-size:.9rem;margin:.4rem 0 .7rem">Manage category names and comma-separated subcategories used by the shop filters.</p>
+    <form id="categoryForm" class="grid">
+      <input type="hidden" id="categoryOriginal">
+      <label>Category name<input type="text" id="categoryName" required maxlength="80"></label>
+      <label>Subcategories<small>Separate each with a comma; leave blank if none</small><input type="text" id="categorySubs" maxlength="1000"></label>
+      <div class="row"><button class="go" type="submit">Save category</button><span class="msg" id="categoryMsg"></span></div>
+    </form>
+    <div class="scroll"><table><thead><tr><th>Category</th><th>Subcategories</th><th>Actions</th></tr></thead><tbody id="shopCategories"></tbody></table></div>
+  </div>
+
+  <div class="card">
+    <div class="row"><h2 style="margin:0">Shop products</h2><button class="ghost" type="button" id="newProduct">Add product</button></div>
+    <p style="color:var(--muted);font-size:.9rem;margin:.4rem 0 .7rem">Images are stored under the public product images folder. Use JPG, PNG or WEBP up to 5 MB.</p>
+    <form id="productForm" hidden>
+      <input type="hidden" id="productId">
+      <input type="hidden" id="productImageName">
+      <div class="grid">
+        <label>Product name<input type="text" id="productName" required maxlength="160"></label>
+        <label>Category<select id="productCategory" required></select></label>
+        <label>Subcategory<input type="text" id="productSubcategory" maxlength="80"></label>
+        <label>Price (Rs.)<input type="number" id="productPrice" min="1" step="1" required></label>
+        <label>Previous price (Rs.)<small>Optional sale price display</small><input type="number" id="productOldPrice" min="0" step="1"></label>
+        <label>Stock status<select id="productStock"><option value="in">In stock</option><option value="out">Out of stock</option><option value="pre">Pre-order</option></select></label>
+        <label>Product image<input type="file" id="productImage" accept="image/png,image/jpeg,image/webp"><small id="productImageCurrent">No image selected</small></label>
+        <label>Description<textarea id="productDescription" rows="3" maxlength="1000"></textarea></label>
+      </div>
+      <div class="row" style="margin-top:.8rem">
+        <label class="toggle"><input type="checkbox" id="tagHot"> Hot deal</label>
+        <label class="toggle"><input type="checkbox" id="tagNew"> New arrival</label>
+        <label class="toggle"><input type="checkbox" id="tagBest"> Best seller</label>
+      </div>
+      <div class="row" style="margin-top:.8rem"><button class="go" type="submit" id="saveProduct">Save product</button><button class="ghost" type="button" id="cancelProduct">Cancel</button><span class="msg" id="productMsg"></span></div>
+    </form>
+    <div class="scroll"><table><thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Image</th><th>Actions</th></tr></thead><tbody id="shopProducts"></tbody></table></div>
+    <p id="noShopProducts" style="color:var(--muted)" hidden>No products yet.</p>
+  </div>
+
+  <div class="card">
+    <h2>Limits and text</h2>
+    <div class="grid">
+      <label>Max quantity<input type="number" id="maxQty"></label>
+      <label>Max file size (MB)<input type="number" id="maxFileMB"></label>
+      <label>Uploads per hour per visitor<small>Protects your API quota</small><input type="number" id="maxUploadsPerHourPerIp"></label>
+      <label>Price checks per hour per visitor<input type="number" id="maxQuotesPerHourPerIp"></label>
+      <label>Quote valid for (hours)<input type="number" id="validityHours"></label>
+    </div>
+    <label style="margin-top:1rem">Note shown under the price<textarea id="customerNote"></textarea></label>
+  </div>
+
+  <div class="card">
+    <h2>Materials</h2>
+    <p style="color:var(--muted);font-size:.9rem;margin-bottom:.7rem">Materials appear here after the first model is uploaded. Untick to hide a material from customers. A markup override replaces the global markup for that material (leave empty to use the global one).</p>
+    <div class="scroll"><table><thead><tr><th>Show</th><th>Material</th><th>Markup % override</th></tr></thead><tbody id="mats"></tbody></table></div>
+    <p id="noMats" style="color:var(--muted)" hidden>No materials yet. Upload a test model on the instant quote page first.</p>
+  </div>
+
+  <div class="row" style="margin-bottom:1.4rem"><button class="go" id="save">Save changes</button><span class="msg" id="saveMsg"></span></div>
+
+  <div class="card">
+    <div class="row"><h2 style="margin:0">Customer quote requests</h2><button class="ghost" id="reloadRequests" style="margin-left:auto">Refresh</button></div>
+    <p style="color:var(--muted);font-size:.9rem;margin:.4rem 0 .7rem">Manual requests and their uploaded files. Attachments are stored privately on this server.</p>
+    <div class="scroll"><table><thead><tr><th>Received</th><th>Ref</th><th>Name / Phone</th><th>Request</th><th>Material / Colour</th><th>Files</th><th>Details</th></tr></thead><tbody id="quoteRequests"></tbody></table></div>
+    <p id="noQuoteRequests" style="color:var(--muted)" hidden>No customer quote requests yet.</p>
+  </div>
+
+  <div class="card">
+    <div class="row"><h2 style="margin:0">Recent quotes</h2><button class="ghost" id="reload" style="margin-left:auto">Refresh</button></div>
+    <p style="color:var(--muted);font-size:.9rem;margin:.4rem 0 .7rem">Each customer quote has a reference number that also appears in their WhatsApp message. "Cost" is your supplier price in USD.</p>
+    <div class="scroll"><table><thead><tr><th>Time</th><th>Ref</th><th>File</th><th>Material</th><th>Qty</th><th>Cost (USD)</th><th>Quoted (Rs.)</th></tr></thead><tbody id="quotes"></tbody></table></div>
+  </div>
+</main>
+
+<script>
+const $ = s => document.querySelector(s);
+const NUM = ["usdToLkr","markupPercent","fixedFeeLkr","flatShippingLkr","minOrderLkr","roundToLkr","maxQty","maxFileMB","maxUploadsPerHourPerIp","maxQuotesPerHourPerIp","validityHours"];
+const ESTIMATOR_NUM = ["printingMargin","fastenerMargin","fastenerCostLkrPerPart","labourMonthlySalaryLkr","labourCostLkrPerMinute","estimatorSetupFeeLkr","estimatorMinJobLkr","estimatorRoundToLkr","printerCostLkrPerMinute","estimatorPrintVolumeCm3PerMinute"];
+const MATERIAL_FIELD = {costPlaPlus:"plaPlus",costAbsPlus:"absPlus",costTpu:"tpu",costPetg:"petg",costAsa:"asa"};
+let S = null;
+let SHOP = null;
+
+async function call(path, method = "GET", body) {
+  const r = await fetch(path, {method, headers: body ? {"Content-Type": "application/json"} : {}, body: body ? JSON.stringify(body) : undefined, credentials: "same-origin"});
+  const j = await r.json().catch(() => ({}));
+  if (r.status === 401 && path !== "/api/admin/login") { show(false); throw new Error("Please log in."); }
+  if (!r.ok) throw new Error(j.error || "Request failed");
+  return j;
+}
+function show(on) { $("#login").hidden = on; $("#app").hidden = !on; $("#logout").hidden = !on; }
+
+$("#loginForm").onsubmit = async e => {
+  e.preventDefault(); $("#loginMsg").textContent = "";
+  try { await call("/api/admin/login", "POST", {password: $("#pw").value}); $("#pw").value = ""; await load(); }
+  catch (err) { $("#loginMsg").textContent = err.message; }
+};
+$("#logout").onclick = async () => { try { await call("/api/admin/logout", "POST", {}); } catch (e) {} show(false); };
+
+async function load() {
+  S = await call("/api/admin/settings");
+  show(true);
+  $("#quotesEnabled").checked = S.quotesEnabled;
+  NUM.forEach(k => $("#" + k).value = S[k]);
+  ESTIMATOR_NUM.forEach(k => $("#"+k).value = S[k] ?? 0);
+  Object.entries(MATERIAL_FIELD).forEach(([field,key]) => $("#"+field).value = S.materialCostLkrPerGram?.[key] ?? 0);
+  $("#customerNote").value = S.customerNote;
+  loadShopCatalog().catch(error => { $("#shopCatalogMsg").textContent = error.message; });
+  const tb = $("#mats"); tb.textContent = "";
+  $("#noMats").hidden = S.knownMaterials.length > 0;
+  S.knownMaterials.forEach(m => {
+    const tr = document.createElement("tr");
+    const c1 = document.createElement("td"), cb = document.createElement("input");
+    cb.type = "checkbox"; cb.checked = !S.disabledMaterials.includes(m.id); cb.dataset.id = m.id; c1.append(cb);
+    const c2 = document.createElement("td"); c2.textContent = m.name || m.id;
+    const c3 = document.createElement("td"), n = document.createElement("input");
+    n.type = "number"; n.step = "0.1"; n.dataset.id = m.id; n.placeholder = "global";
+    if (S.materialMarkup[m.id] != null) n.value = S.materialMarkup[m.id];
+    c3.append(n);
+    tr.append(c1, c2, c3); tb.append(tr);
+  });
+  preview(); loadQuotes(); loadQuoteRequests(); loadShopCatalog();
+}
+
+function collect() {
+  const o = {quotesEnabled: $("#quotesEnabled").checked, customerNote: $("#customerNote").value, materialMarkup: {}, disabledMaterials: []};
+  NUM.forEach(k => o[k] = parseFloat($("#" + k).value));
+  ESTIMATOR_NUM.forEach(k => o[k] = parseFloat($("#"+k).value));
+  o.materialCostLkrPerGram = Object.fromEntries(Object.entries(MATERIAL_FIELD).map(([field,key]) => [key,parseFloat($("#"+field).value)]));
+  document.querySelectorAll("#mats input[type=checkbox]").forEach(cb => { if (!cb.checked) o.disabledMaterials.push(cb.dataset.id); });
+  document.querySelectorAll("#mats input[type=number]").forEach(n => { if (n.value !== "") o.materialMarkup[n.dataset.id] = parseFloat(n.value); });
+  return o;
+}
+
+function preview() {
+  const o = collect(), cost = 10;
+  let v = cost * o.usdToLkr * (1 + o.markupPercent / 100) + o.fixedFeeLkr;
+  v = Math.max(v, o.minOrderLkr) + o.flatShippingLkr;
+  v = Math.round(v / o.roundToLkr) * o.roundToLkr;
+  $("#preview").textContent = isFinite(v) ? `Example: a part that costs $${cost} from the supplier would be quoted at Rs. ${v.toLocaleString("en-LK")}.` : "";
+  if (o.estimatorPrintVolumeCm3PerMinute <= 0) {
+    $("#estimatorPreview").textContent = "Add a measured material throughput before customer estimates can be priced.";
+    return;
+  }
+  const minutes = 10 / o.estimatorPrintVolumeCm3PerMinute;
+  const material = 10 * o.materialCostLkrPerGram.plaPlus;
+  const machine = minutes * (o.printerCostLkrPerMinute + o.labourCostLkrPerMinute);
+  const raw = (material + machine) * o.printingMargin + o.fastenerCostLkrPerPart * o.fastenerMargin + o.estimatorSetupFeeLkr;
+  const result = Math.max(o.estimatorMinJobLkr, raw);
+  const rounded = Math.round(result / o.estimatorRoundToLkr) * o.estimatorRoundToLkr;
+  $("#estimatorPreview").textContent = isFinite(rounded) ? `Example: a 10 g PLA+ part is estimated at Rs. ${rounded.toLocaleString("en-LK")}.` : "Check the estimator pricing values.";
+}
+document.addEventListener("input", e => { if (e.target.closest("#app")) preview(); });
+
+$("#save").onclick = async () => {
+  const m = $("#saveMsg"); m.className = "msg"; m.textContent = "Saving…";
+  try { await call("/api/admin/settings", "PUT", collect()); m.className = "msg ok"; m.textContent = "Saved. New quotes use these values straight away."; }
+  catch (e) { m.className = "msg bad"; m.textContent = e.message; }
+};
+
+async function loadQuotes() {
+  const rows = await call("/api/admin/quotes");
+  const tb = $("#quotes"); tb.textContent = "";
+  rows.slice().reverse().forEach(q => {
+    const tr = document.createElement("tr");
+    const cells = [new Date(q.time).toLocaleString(), q.ref, q.file, [q.material, q.color].filter(Boolean).join(" / "), q.qty, Number(q.jlcCostUsd).toFixed(2), Number(q.quotedLkr).toLocaleString("en-LK")];
+    cells.forEach(t => { const td = document.createElement("td"); td.textContent = t; tr.append(td); });
+    tb.append(tr);
+  });
+}
+async function loadQuoteRequests() {
+  const rows = await call("/api/admin/quote-requests");
+  const tb = $("#quoteRequests"); tb.textContent = "";
+  $("#noQuoteRequests").hidden = rows.length > 0;
+  rows.forEach(request => {
+    const tr = document.createElement("tr");
+    const values = [new Date(request.time).toLocaleString(), request.ref, `${request.name}\n${request.phone}`, request.type, [request.material, request.colour].filter(Boolean).join(" / ")];
+    values.forEach((value, index) => {
+      const td = document.createElement("td"); td.textContent = value;
+      if (index === 2 || index === 3) td.style.whiteSpace = "pre-wrap";
+      tr.append(td);
+    });
+    const files = document.createElement("td");
+    (request.files || []).forEach(file => {
+      const a = document.createElement("a"); a.href = file.downloadUrl; a.textContent = `${file.name} (${(file.size / 1048576).toFixed(1)} MB)`;
+      a.setAttribute("download", ""); files.append(a, document.createElement("br"));
+    });
+    if (!(request.files || []).length) files.textContent = "None";
+    tr.append(files);
+    const details = document.createElement("td"); details.textContent = request.details; details.style.minWidth = "220px"; details.style.whiteSpace = "pre-wrap"; tr.append(details);
+    tb.append(tr);
+  });
+}
+async function loadShopCatalog() {
+  SHOP = await call("/api/admin/shop/catalog");
+  renderShopCatalog();
+}
+function renderShopCatalog() {
+  const categories = Object.entries(SHOP.categories || {});
+  const categoryRows = $("#shopCategories"); categoryRows.textContent = "";
+  categories.forEach(([name, subs]) => {
+    const row = document.createElement("tr");
+    const label = document.createElement("td"); label.textContent = name;
+    const sub = document.createElement("td"); sub.textContent = subs.join(", ") || "-";
+    const actions = document.createElement("td");
+    const edit = document.createElement("button"); edit.type = "button"; edit.className = "ghost"; edit.dataset.editCategory = name; edit.textContent = "Edit";
+    const remove = document.createElement("button"); remove.type = "button"; remove.className = "ghost"; remove.dataset.deleteCategory = name; remove.textContent = "Delete";
+    actions.append(edit, remove); row.append(label, sub, actions); categoryRows.append(row);
+  });
+  const select = $("#productCategory"), selected = select.value;
+  select.textContent = "";
+  categories.forEach(([name]) => { const option = document.createElement("option"); option.value = name; option.textContent = name; select.append(option); });
+  if (categories.some(([name]) => name === selected)) select.value = selected;
+
+  const productsBody = $("#shopProducts"); productsBody.textContent = "";
+  $("#noShopProducts").hidden = SHOP.products.length > 0;
+  SHOP.products.forEach(product => {
+    const row = document.createElement("tr");
+    const name = document.createElement("td"); name.textContent = product.name;
+    const category = document.createElement("td"); category.textContent = product.cat + (product.sub ? " / " + product.sub : "");
+    const price = document.createElement("td"); price.textContent = "Rs. " + Number(product.price).toLocaleString("en-LK");
+    const stock = document.createElement("td"); stock.textContent = {in:"In stock",out:"Out of stock",pre:"Pre-order"}[product.stock] || product.stock;
+    const image = document.createElement("td");
+    if (product.img) { const preview = document.createElement("img"); preview.src = "/images/products/" + product.img; preview.alt = ""; preview.width = 48; preview.height = 48; preview.style.objectFit = "cover"; image.append(preview); }
+    else image.textContent = "-";
+    const actions = document.createElement("td");
+    const edit = document.createElement("button"); edit.type = "button"; edit.className = "ghost"; edit.dataset.editProduct = product.id; edit.textContent = "Edit";
+    const remove = document.createElement("button"); remove.type = "button"; remove.className = "ghost"; remove.dataset.deleteProduct = product.id; remove.textContent = "Delete";
+    actions.append(edit, remove); row.append(name, category, price, stock, image, actions); productsBody.append(row);
+  });
+}
+async function saveShopCatalog() {
+  await call("/api/admin/shop/catalog", "PUT", SHOP);
+  SHOP = await call("/api/admin/shop/catalog");
+  renderShopCatalog();
+}
+function resetCategoryForm() {
+  $("#categoryForm").reset();
+  $("#categoryOriginal").value = "";
+  $("#categoryMsg").textContent = "";
+}
+function openProductForm(product) {
+  const form = $("#productForm"); form.hidden = false; form.reset();
+  $("#productId").value = product?.id ?? "";
+  $("#productName").value = product?.name ?? "";
+  $("#productCategory").value = product?.cat ?? Object.keys(SHOP.categories)[0] ?? "";
+  $("#productSubcategory").value = product?.sub ?? "";
+  $("#productPrice").value = product?.price ?? "";
+  $("#productOldPrice").value = product?.old ?? "";
+  $("#productStock").value = product?.stock ?? "in";
+  $("#productDescription").value = product?.desc ?? "";
+  $("#tagHot").checked = (product?.tags || []).includes("hot");
+  $("#tagNew").checked = (product?.tags || []).includes("new");
+  $("#tagBest").checked = (product?.tags || []).includes("best");
+  $("#productImageCurrent").textContent = product?.img ? "Current image: " + product.img : "No image selected";
+  $("#productMsg").textContent = "";
+  form.scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+$("#categoryForm").onsubmit = async event => {
+  event.preventDefault();
+  const original = $("#categoryOriginal").value;
+  const name = $("#categoryName").value.trim();
+  const subs = [...new Set($("#categorySubs").value.split(",").map(value => value.trim()).filter(Boolean))];
+  const msg = $("#categoryMsg");
+  if (!name) return;
+  if (original !== name && SHOP.categories[name]) { msg.textContent = "That category already exists."; return; }
+  const categories = {};
+  Object.entries(SHOP.categories).forEach(([key, values]) => { categories[key === original ? name : key] = key === original ? subs : values; });
+  if (!original) categories[name] = subs;
+  const products = SHOP.products.map(product => original && product.cat === original ? {...product,cat:name} : product);
+  const previous = SHOP; SHOP = {categories,products};
+  try { await saveShopCatalog(); resetCategoryForm(); msg.textContent = "Category saved."; }
+  catch (error) { SHOP = previous; renderShopCatalog(); msg.textContent = error.message; }
+};
+
+$("#shopCategories").addEventListener("click", async event => {
+  const editName = event.target.closest("[data-edit-category]")?.dataset.editCategory;
+  if (editName) {
+    $("#categoryOriginal").value = editName;
+    $("#categoryName").value = editName;
+    $("#categorySubs").value = SHOP.categories[editName].join(", ");
+    $("#categoryMsg").textContent = "Editing category.";
+    return;
+  }
+  const deleteName = event.target.closest("[data-delete-category]")?.dataset.deleteCategory;
+  if (!deleteName) return;
+  const msg = $("#categoryMsg");
+  if (SHOP.products.some(product => product.cat === deleteName)) { msg.textContent = "Move or delete this category's products first."; return; }
+  if (Object.keys(SHOP.categories).length <= 1) { msg.textContent = "At least one category is required."; return; }
+  const previous = SHOP; SHOP = {categories:{...SHOP.categories},products:SHOP.products}; delete SHOP.categories[deleteName];
+  try { await saveShopCatalog(); msg.textContent = "Category deleted."; }
+  catch (error) { SHOP = previous; renderShopCatalog(); msg.textContent = error.message; }
+});
+
+$("#newProduct").onclick = () => openProductForm(null);
+$("#cancelProduct").onclick = () => { $("#productForm").hidden = true; $("#productForm").reset(); };
+$("#shopProducts").addEventListener("click", async event => {
+  const editId = event.target.closest("[data-edit-product]")?.dataset.editProduct;
+  if (editId) { openProductForm(SHOP.products.find(product => String(product.id) === editId)); return; }
+  const deleteId = event.target.closest("[data-delete-product]")?.dataset.deleteProduct;
+  if (!deleteId) return;
+  const previous = SHOP; SHOP = {...SHOP,products:SHOP.products.filter(product => String(product.id) !== deleteId)};
+  try { await saveShopCatalog(); }
+  catch (error) { SHOP = previous; renderShopCatalog(); $("#shopCatalogMsg").textContent = error.message; }
+});
+$("#productForm").onsubmit = async event => {
+  event.preventDefault();
+  const msg = $("#productMsg"), imageInput = $("#productImage");
+  const oldId = $("#productId").value;
+  const prior = SHOP.products.find(product => String(product.id) === oldId);
+  const product = {
+    id: oldId ? Number(oldId) : Math.max(0,...SHOP.products.map(item => Number(item.id)||0))+1,
+    name: $("#productName").value.trim(), cat: $("#productCategory").value,
+    sub: $("#productSubcategory").value.trim(), price: Number($("#productPrice").value),
+    tags: [$("#tagHot").checked?"hot":null,$("#tagNew").checked?"new":null,$("#tagBest").checked?"best":null].filter(Boolean),
+    stock: $("#productStock").value, desc: $("#productDescription").value.trim()
+  };
+  const oldPrice = Number($("#productOldPrice").value);
+  if (oldPrice > 0) product.old = oldPrice;
+  if (prior?.img) product.img = prior.img;
+  const button = $("#saveProduct"); button.disabled = true; msg.textContent = "Saving product…";
+  try {
+    if (imageInput.files.length) {
+      const body = new FormData(); body.append("image",imageInput.files[0]);
+      const response = await fetch("/api/admin/shop/image",{method:"POST",body,credentials:"same-origin"});
+      const result = await response.json().catch(()=>({}));
+      if (!response.ok) throw new Error(result.error||"Image upload failed.");
+      product.img = result.img;
+    }
+    const products = oldId ? SHOP.products.map(item => String(item.id) === oldId ? product : item) : [...SHOP.products,product];
+    const previous = SHOP; SHOP = {...SHOP,products};
+    try { await saveShopCatalog(); }
+    catch (error) { SHOP=previous; renderShopCatalog(); throw error; }
+    $("#productForm").hidden = true; $("#productForm").reset();
+    msg.textContent = "Product saved. The shop updates on its next reload.";
+  } catch (error) { msg.textContent = error.message; }
+  finally { button.disabled = false; }
+};
+$("#reloadShopCatalog").onclick = () => loadShopCatalog().catch(error => { $("#shopCatalogMsg").textContent = error.message; });
+$("#resetCategoryForm").onclick = resetCategoryForm;
+$("#productImage").onchange = event => { $("#productImageCurrent").textContent = event.target.files[0]?.name || "No image selected"; };
+
+$("#reload").onclick = () => loadQuotes().catch(() => {});
+$("#reloadRequests").onclick = () => loadQuoteRequests().catch(() => {});
+
+call("/api/admin/settings").then(load).catch(() => show(false));
+</script>
+</body>
+</html>

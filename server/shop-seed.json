@@ -1,0 +1,32 @@
+{
+  "categories": {
+    "3D Printers": ["FDM", "Resin"],
+    "Filaments": ["PLA", "PETG", "ABS & ASA", "TPU & Flexible"],
+    "Resins": ["Standard", "Engineering"],
+    "Printer Parts": ["Nozzles", "Hotends", "Build Plates"],
+    "3D Scanners": [],
+    "Tools & Accessories": []
+  },
+  "products": [
+    {"id":1,"name":"Ender-style FDM 3D Printer","cat":"3D Printers","sub":"FDM","price":89900,"old":99900,"tags":["hot","best"],"stock":"in","desc":"Reliable all-rounder for beginners and makers."},
+    {"id":2,"name":"Enclosed Core-XY Printer","cat":"3D Printers","sub":"FDM","price":249000,"tags":["best"],"stock":"in","desc":"Fast, enclosed and ready for PETG and ABS."},
+    {"id":3,"name":"Resin Printer 8K","cat":"3D Printers","sub":"Resin","price":119000,"tags":["new"],"stock":"in","desc":"Fine detail for miniatures, jewellery and models."},
+    {"id":4,"name":"Large-Format FDM Printer","cat":"3D Printers","sub":"FDM","price":189000,"old":219000,"tags":["hot"],"stock":"in","desc":"Big build volume for large parts and props."},
+    {"id":5,"name":"Compact Resin Printer","cat":"3D Printers","sub":"Resin","price":74900,"old":89900,"tags":["hot"],"stock":"in","desc":"Small footprint, high detail, easy to start."},
+    {"id":6,"name":"Multi-Colour Enclosed Printer","cat":"3D Printers","sub":"FDM","price":329000,"tags":["new"],"stock":"pre","desc":"Print in several colours in one job."},
+    {"id":7,"name":"PLA Filament 1kg – Black","cat":"Filaments","sub":"PLA","price":5900,"old":7500,"tags":["hot","best"],"stock":"in","desc":"Easy-printing standard PLA, 1.75 mm."},
+    {"id":8,"name":"PLA+ Filament 1kg – White","cat":"Filaments","sub":"PLA","price":6400,"tags":["new"],"stock":"in","desc":"Tougher PLA with a clean finish."},
+    {"id":9,"name":"PETG Filament 1kg – Orange","cat":"Filaments","sub":"PETG","price":6900,"tags":["best"],"stock":"in","desc":"Strong, moisture-resistant, 1.75 mm."},
+    {"id":10,"name":"ABS Filament 1kg – Grey","cat":"Filaments","sub":"ABS & ASA","price":6500,"old":7800,"tags":["hot"],"stock":"in","desc":"Heat-resistant filament for functional parts."},
+    {"id":11,"name":"TPU Flexible Filament 500g","cat":"Filaments","sub":"TPU & Flexible","price":7900,"tags":["new"],"stock":"in","desc":"Soft, flexible prints for seals and grips."},
+    {"id":12,"name":"Standard Resin 1kg – Grey","cat":"Resins","sub":"Standard","price":8900,"tags":["best"],"stock":"in","desc":"Sharp detail for general resin printing."},
+    {"id":13,"name":"Tough Engineering Resin 1kg","cat":"Resins","sub":"Engineering","price":12500,"tags":["new"],"stock":"in","desc":"Strong, impact-resistant functional resin."},
+    {"id":14,"name":"Brass Nozzle Set (0.2–0.8mm)","cat":"Printer Parts","sub":"Nozzles","price":2400,"old":3200,"tags":["hot"],"stock":"in","desc":"Assorted brass nozzles for FDM printers."},
+    {"id":15,"name":"All-Metal Hotend Kit","cat":"Printer Parts","sub":"Hotends","price":8900,"tags":["best"],"stock":"in","desc":"Upgrade for high-temperature printing."},
+    {"id":16,"name":"Magnetic Flex Build Plate","cat":"Printer Parts","sub":"Build Plates","price":5500,"old":6500,"tags":["hot"],"stock":"in","desc":"Flexible plate, prints pop off easily."},
+    {"id":17,"name":"Handheld 3D Scanner","cat":"3D Scanners","sub":"","price":189000,"tags":["new"],"stock":"pre","desc":"Scan real objects into 3D models."},
+    {"id":18,"name":"Digital Calipers 150mm","cat":"Tools & Accessories","sub":"","price":3900,"tags":["best"],"stock":"in","desc":"Accurate measuring for parts and prints."},
+    {"id":19,"name":"Printer Tool Kit","cat":"Tools & Accessories","sub":"","price":4500,"tags":["new"],"stock":"in","desc":"Scraper, cutters, tweezers and more."},
+    {"id":20,"name":"Filament Dry Box","cat":"Tools & Accessories","sub":"","price":9800,"old":11500,"tags":["hot"],"stock":"out","desc":"Keeps filament dry while printing."}
+  ]
+}

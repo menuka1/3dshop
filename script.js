@@ -1,11 +1,11 @@
 // ====== EDIT THESE ======
-const WHATSAPP = "94770000000";          // your number, country code first, no + or spaces
-const PHONE = "+94 77 000 0000";
-const EMAIL = "hello@3dshop.lk";
-const LOCATION = "Colombo, Sri Lanka";
+const WHATSAPP = "94774757677";          // your number, country code first, no + or spaces
+const PHONE = "+94 77 475 7677";
+const EMAIL = "info@3dshop.lk";
+const LOCATION = "122/5, Attidiya Road, Bellantara, Dehiwala";
 const SALE_ENDS = "2026-11-30T23:59:59"; // flash sale end date (the countdown hides itself after this)
 // Categories and sub-categories shown on the shop page
-const CATS = {
+const DEFAULT_CATS = {
   "3D Printers":["FDM","Resin"],
   "Filaments":["PLA","PETG","ABS & ASA","TPU & Flexible"],
   "Resins":["Standard","Engineering"],
@@ -16,7 +16,7 @@ const CATS = {
 // tags: "hot" = Hot deals, "new" = New arrivals, "best" = Best seller. stock: "in" | "out" | "pre"
 // old = previous price (shows the discount). Keep ids unique and do not reuse old ids.
 // img = photo file name inside images/products/ (for example img:"ender-3.webp"). Without img, a category icon is shown.
-const PRODUCTS = [
+const DEFAULT_PRODUCTS = [
   {id:1,name:"Ender-style FDM 3D Printer",cat:"3D Printers",sub:"FDM",price:89900,old:99900,tags:["hot","best"],stock:"in",desc:"Reliable all-rounder for beginners and makers."},
   {id:2,name:"Enclosed Core-XY Printer",cat:"3D Printers",sub:"FDM",price:249000,tags:["best"],stock:"in",desc:"Fast, enclosed and ready for PETG and ABS."},
   {id:3,name:"Resin Printer 8K",cat:"3D Printers",sub:"Resin",price:119000,tags:["new"],stock:"in",desc:"Fine detail for miniatures, jewellery and models."},
@@ -38,6 +38,8 @@ const PRODUCTS = [
   {id:19,name:"Printer Tool Kit",cat:"Tools & Accessories",sub:"",price:4500,tags:["new"],stock:"in",desc:"Scraper, cutters, tweezers and more."},
   {id:20,name:"Filament Dry Box",cat:"Tools & Accessories",sub:"",price:9800,old:11500,tags:["hot"],stock:"out",desc:"Keeps filament dry while printing."}
 ];
+const CATS = window.SHOP_CATALOG?.categories || DEFAULT_CATS;
+let PRODUCTS = window.SHOP_CATALOG?.products || DEFAULT_PRODUCTS;
 const FEATURED = [1,2,3,4,5]; // printers shown on the home page
 const WORKS = [
   {img:"gas-detector",t:"Gas Detector Enclosure",d:"Custom housing, blueprint to finished print"},
@@ -51,9 +53,10 @@ const WORKS = [
 ];
 // ========================
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)], fmt=n=>"Rs. "+n.toLocaleString("en-LK");
+const esc=value=>String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
 const page=document.body.dataset.page;
 const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
-const NAV=[["index.html","Home","home"],["services.html","Services","services"],["portfolio.html","Portfolio","portfolio"],["shop.html","Shop","shop"],["contact.html","Contact & FAQ","contact"]];
+const NAV=[["index.html","Home","home"],["services.html","Services","services"],["portfolio.html","Portfolio","portfolio"],["shop.html","Shop","shop"],["instant-quote.html","Instant quote","instant"],["contact.html","Contact & FAQ","contact"]];
 const ICONS={
   "3D Printers":'<svg viewBox="0 0 64 64" aria-hidden="true"><rect x="8" y="6" width="48" height="52" rx="4"/><path d="M8 16h48M20 16v20M44 16v20M20 30h24"/><rect x="24" y="30" width="16" height="6"/><path d="M14 50h36"/></svg>',
   "Filaments":'<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="24"/><circle cx="32" cy="32" r="8"/><path d="M12 22c8 4 32 4 40 0M12 42c8-4 32-4 40 0"/></svg>',
@@ -67,16 +70,16 @@ const pct=p=>p.old?Math.round((p.old-p.price)/p.old*100):0;
 // ---- shared header / footer / cart drawer
 $("#site-header").outerHTML=`<header class="header"><div class="header-in">
   <a class="brand" href="index.html" aria-label="3DShop.lk home"><img src="images/logo-192.png" alt=""><span>3DShop<em>.lk</em></span></a>
-  <nav class="nav" id="nav" aria-label="Primary">${NAV.map(n=>`<a href="${n[0]}"${n[2]===page?' aria-current="page"':""}>${n[1]}</a>`).join("")}<a class="btn small mobile-only" href="quote.html">Get a free quote</a></nav>
+  <nav class="nav" id="nav" aria-label="Primary">${NAV.map(n=>`<a href="${n[0]}"${n[2]===page?' aria-current="page"':""}>${n[1]}</a>`).join("")}<a class="btn small mobile-only" href="instant-quote.html">Get a free quote</a></nav>
   <button class="cartbtn" id="openCart" aria-label="Open cart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2.2l2.1 10.2a1.5 1.5 0 0 0 1.5 1.2h8.1a1.5 1.5 0 0 0 1.5-1.1L20 8H6.2"/><circle cx="9.5" cy="19.5" r="1.4"/><circle cx="17" cy="19.5" r="1.4"/></svg><b id="cartCount">0</b></button>
-  <a class="btn small desk-only" href="quote.html">Get a free quote</a>
+  <a class="btn small desk-only" href="instant-quote.html">Get a free quote</a>
   <button class="menubtn" id="menuBtn" aria-label="Menu" aria-expanded="false" aria-controls="nav"><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span></button>
 </div></header>`;
 $("#site-footer").outerHTML=`<footer class="footer"><div class="wrap">
   <div class="fcols">
-    <div><a class="brand" href="index.html"><img src="images/logo-192.png" alt=""><span>3DShop<em>.lk</em></span></a><p>3D printing and 3D printers in Sri Lanka.</p></div>
+    <div><a class="brand" href="index.html"><img src="images/logo-192.png" alt=""><span>3DShop<em>.lk</em></span></a><p>Tesla Robotics (Pvt) Ltd.</p><p>3D printing and 3D printers in Sri Lanka.</p></div>
     <div><h4>Pages</h4>${NAV.map(n=>`<a href="${n[0]}">${n[1]}</a>`).join("")}</div>
-    <div><h4>Services</h4><a href="services.html">3D printing</a><a href="services.html#design">3D design</a><a href="quote.html">Free quote</a></div>
+    <div><h4>Services</h4><a href="services.html">3D printing</a><a href="services.html#design">3D design</a><a href="instant-quote.html">Free quote</a></div>
     <div><h4>Contact</h4><a href="tel:${PHONE.replace(/\s/g,"")}">${PHONE}</a><a href="mailto:${EMAIL}">${EMAIL}</a><span>${LOCATION}</span></div>
   </div>
   <p class="copy">© ${new Date().getFullYear()} 3DShop.lk. All rights reserved.</p>
@@ -112,11 +115,11 @@ const change=(id,d)=>{const i=cart.find(x=>x.id===id);if(!i)return;i.q+=d;if(i.q
 const STOCK={in:"In stock",out:"Out of stock",pre:"Pre-order"};
 // Daraz-style card. Optional per-product fields: rating (0-5), reviews (count), sold (count), free (true = "Free delivery")
 const stars=r=>{const f=Math.round(r*2)/2;return [1,2,3,4,5].map(i=>`<i class="${f>=i?"full":f>=i-.5?"half":""}"></i>`).join("")};
-const card=p=>{const d=pct(p);const k=n=>n>=1000?(n/1000).toFixed(1).replace(".0","")+"K":n;
-  return `<article class="card"><div class="thumb${p.img?" has-img":""}">${p.img?`<img src="images/products/${p.img}" alt="${p.name}" loading="lazy" width="600" height="600">`:ICONS[p.cat]}
+const card=p=>{const d=pct(p);const k=n=>n>=1000?(n/1000).toFixed(1).replace(".0","")+"K":n;const icon=ICONS[p.cat]||ICONS["Tools & Accessories"];
+  return `<article class="card"><div class="thumb${p.img?" has-img":""}">${p.img?`<img src="images/products/${esc(p.img)}" alt="${esc(p.name)}" loading="lazy" width="600" height="600">`:icon}
   ${p.tags.includes("new")||p.tags.includes("best")?`<span class="ribbon${p.tags.includes("new")?"":" best"}">${p.tags.includes("new")?"New":"Best seller"}</span>`:""}
   ${d?`<span class="off">-${d}%</span>`:""}</div>
-  <div class="body"><h3>${p.name}</h3>
+  <div class="body"><h3>${esc(p.name)}</h3>
   <div class="price">${fmt(p.price)}</div>
   ${p.old?`<div class="was"><s>${fmt(p.old)}</s><b>-${d}%</b></div>`:""}
   ${p.rating?`<div class="rate"><span class="stars" aria-label="${p.rating} out of 5">${stars(p.rating)}</span>${p.reviews?`<em>(${k(p.reviews)})</em>`:""}${p.sold?`<span class="sold">${k(p.sold)} sold</span>`:""}</div>`:""}
@@ -160,7 +163,7 @@ function initRails(ids){
 }
 
 // ---- home: featured printers (auto-scrolling)
-if($("#featuredRail")){$("#featuredRail").innerHTML=FEATURED.map(id=>card(prod(id))).join("");initRails(["featuredRail"])}
+if($("#featuredRail")){$("#featuredRail").innerHTML=FEATURED.map(id=>prod(id)).filter(Boolean).map(card).join("");initRails(["featuredRail"])}
 const workBtn=w=>`<button class="work" data-img="${w.img}" data-t="${w.t}"><img src="images/${w.img}.webp" alt="${w.t}: CAD blueprint beside the finished 3D-printed part" loading="lazy" width="1000" height="1000"><div><b>${w.t}</b><span>${w.d}</span></div></button>`;
 if($("#teaser"))$("#teaser").innerHTML=WORKS.slice(0,4).map(workBtn).join("");
 
@@ -182,13 +185,13 @@ if($("#grid")){
   const count=(c,s)=>PRODUCTS.filter(p=>p.cat===c&&(!s||p.sub===s)).length;
 
   // category tiles
-  $("#catTiles").innerHTML=Object.keys(CATS).map(c=>`<button class="cat-tile" data-cat="${c}">${ICONS[c]}<b>${c}</b><span>${count(c)} items</span></button>`).join("");
+  $("#catTiles").innerHTML=Object.keys(CATS).map(c=>`<button class="cat-tile" data-cat="${esc(c)}">${ICONS[c]||ICONS["Tools & Accessories"]}<b>${esc(c)}</b><span>${count(c)} items</span></button>`).join("");
 
   // sidebar tree
   const drawSide=()=>{
     $("#sideCats").innerHTML=`<button class="side-all" data-cat="All" aria-current="${cat==="All"}">All products <span>${PRODUCTS.length}</span></button>`+
-      Object.entries(CATS).map(([c,subs])=>`<div class="side-grp"><button data-cat="${c}" aria-current="${cat===c&&!sub}">${c} <span>${count(c)}</span></button>`+
-      (cat===c&&subs.length?`<div class="side-sub">${subs.map(s=>`<button data-cat="${c}" data-sub="${s}" aria-current="${sub===s}">${s} <span>${count(c,s)}</span></button>`).join("")}</div>`:"")+`</div>`).join("");
+      Object.entries(CATS).map(([c,subs])=>`<div class="side-grp"><button data-cat="${esc(c)}" aria-current="${cat===c&&!sub}">${esc(c)} <span>${count(c)}</span></button>`+
+      (cat===c&&subs.length?`<div class="side-sub">${subs.map(s=>`<button data-cat="${esc(c)}" data-sub="${esc(s)}" aria-current="${sub===s}">${esc(s)} <span>${count(c,s)}</span></button>`).join("")}</div>`:"")+`</div>`).join("");
   };
   const draw=()=>{
     $("#tabs").innerHTML=tabs.map(t=>`<button role="tab" data-tab="${t[0]}" aria-selected="${t[0]===tab}">${t[1]}</button>`).join("");
@@ -264,11 +267,28 @@ $$("#swatches button").forEach(b=>b.onclick=()=>{
   $$("#swatches button").forEach(x=>x.setAttribute("aria-checked",x===b));
   $("#cube").style.setProperty("--col",b.dataset.col)});
 
-// ---- quote form -> WhatsApp
-if($("#quoteForm"))$("#quoteForm").onsubmit=e=>{e.preventDefault();const f=Object.fromEntries(new FormData(e.target));
-  const msg=`Quote request\nType: ${f.type}\nName: ${f.name}\nPhone: ${f.phone}\nMaterial: ${f.material}\nColour: ${f.colour}\nDetails: ${f.details}`;
-  window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`,"_blank");
-  $("#quoteNote").textContent="Thanks. Attach your 3D file in the WhatsApp chat that just opened.";e.target.reset()};
+// ---- quote form -> private inbox, then WhatsApp
+if($("#quoteForm"))$("#quoteForm").onsubmit=async e=>{
+  e.preventDefault();
+  const form=e.target, button=form.querySelector('button[type="submit"]'), note=$("#quoteNote");
+  const chat=window.open("about:blank","_blank");
+  button.disabled=true;note.textContent="Sending your quote request…";
+  try{
+    const response=await fetch("/api/quote-requests",{method:"POST",body:new FormData(form)});
+    const result=await response.json().catch(()=>({}));
+    if(!response.ok)throw new Error(result.error||"Could not submit your request. Please try again.");
+    const formData=Object.fromEntries(new FormData(form));
+    const msg=`Quote request ${result.ref}\nType: ${formData.type}\nName: ${formData.name}\nPhone: ${formData.phone}\nMaterial: ${formData.material}\nColour: ${formData.colour}\nDetails: ${formData.details}`;
+    const whatsappUrl=`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
+    if(chat)chat.location.href=whatsappUrl;
+    note.textContent=`Request ${result.ref} received. We have your details${form.querySelector('[name="files"]').files.length?" and files":""}. `;
+    const continueLink=document.createElement("a");continueLink.href=whatsappUrl;continueLink.target="_blank";continueLink.rel="noopener";continueLink.textContent="Continue to WhatsApp";note.append(continueLink);
+    form.reset();
+  }catch(error){
+    if(chat)chat.close();
+    note.textContent=error.message;
+  }finally{button.disabled=false}
+};
 
 // ---- contact page details
 $$("[data-phone]").forEach(a=>{a.textContent=PHONE;a.href="tel:"+PHONE.replace(/\s/g,"")});
