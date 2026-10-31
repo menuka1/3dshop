@@ -36,6 +36,7 @@
   <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
   <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-8 9"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-6 6.5-6s6.5 2.5 6.5 6M16 4.8a3.5 3.5 0 0 1 0 6.4M18 14.3c2.2.7 3.5 2.6 3.5 5.7"/></symbol>
   <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></symbol>
 </svg>
 
@@ -64,6 +65,7 @@
     <nav class="side-nav">
       <p class="side-label">Overview</p>
       <a href="#dashboard" data-nav="dashboard"><svg class="ico"><use href="#i-home"/></svg>Dashboard</a>
+      <a href="#visitors" data-nav="visitors"><svg class="ico"><use href="#i-users"/></svg>Visitors</a>
       <a href="#requests" data-nav="requests"><svg class="ico"><use href="#i-inbox"/></svg>Quote requests<b class="count" id="navRequests" hidden></b></a>
       <a href="#quotes" data-nav="quotes"><svg class="ico"><use href="#i-receipt"/></svg>Instant quotes</a>
       <p class="side-label">Shop</p>
@@ -120,6 +122,38 @@
           <div class="card-head"><h2>Latest instant quotes</h2><a class="link" href="#quotes">View all</a></div>
           <div class="table-wrap"><table class="table"><thead><tr><th>Time</th><th>Ref</th><th>File</th><th>Material</th><th class="num">Quoted (Rs.)</th></tr></thead><tbody id="dashQuotes"></tbody></table></div>
           <p class="empty" id="dashQuotesEmpty" hidden>No instant quotes yet.</p>
+        </div>
+      </section>
+
+      <!-- Visitors -->
+      <section class="view" id="view-visitors" hidden>
+        <div class="card">
+          <div class="toolbar">
+            <select id="visitDays" aria-label="Time range"><option value="1">Today</option><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option></select>
+            <label class="switch compact"><input type="checkbox" id="visitBots"><span class="track"></span><span>Include bots &amp; crawlers</span></label>
+            <button class="btn ghost push" type="button" id="reloadVisits"><svg class="ico"><use href="#i-refresh"/></svg>Refresh</button>
+          </div>
+          <p class="muted small">Every page view on the public website is recorded with the visitor&rsquo;s IP address. A <strong>visit</strong> is a burst of page views from one IP with less than 30 minutes between them. Your own views while signed in to admin are not counted. IP addresses are personal data: they are deleted automatically after the retention period set in <code>config.properties</code> (90 days by default).</p>
+        </div>
+        <div class="kpis" id="visitKpis"></div>
+        <div class="card">
+          <div class="card-head"><h2>Page views per day</h2><span class="legend"><i class="dot views"></i>Page views <i class="dot unique"></i>Unique visitors</span></div>
+          <div class="chart" id="visitChart" role="img" aria-label="Bar chart of page views per day"></div>
+        </div>
+        <div class="grid-3">
+          <div class="card"><div class="card-head"><h2>Top pages</h2></div><div id="visitPages" class="bars"></div></div>
+          <div class="card"><div class="card-head"><h2>Where visitors come from</h2></div><div id="visitRefs" class="bars"></div></div>
+          <div class="card"><div class="card-head"><h2>Devices &amp; browsers</h2></div><div id="visitDevices"></div></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h2>Visitors by IP address</h2><button class="btn ghost sm" type="button" id="exportVisits"><svg class="ico"><use href="#i-download"/></svg>Export CSV</button></div>
+          <div class="toolbar"><label class="search"><svg class="ico"><use href="#i-search"/></svg><input type="search" id="visitSearch" placeholder="Search IP address, page or device" aria-label="Search visitors"></label></div>
+          <div class="table-wrap"><table class="table"><thead><tr><th>IP address</th><th class="num">Visits</th><th class="num">Page views</th><th>Last page</th><th>Device</th><th>First seen</th><th>Last seen</th></tr></thead><tbody id="visitIpRows"></tbody></table></div>
+          <p class="empty" id="visitIpEmpty" hidden>No visitors recorded for this period yet.</p>
+        </div>
+        <div class="card">
+          <div class="card-head"><h2>Live activity</h2><span class="muted small">Latest 150 page views</span></div>
+          <div class="table-wrap"><table class="table"><thead><tr><th>Time</th><th>IP address</th><th>Page</th><th>Device</th><th>From</th></tr></thead><tbody id="visitRecent"></tbody></table></div>
         </div>
       </section>
 

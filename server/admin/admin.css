@@ -110,6 +110,32 @@ h1,h2,h3{color:var(--ink);line-height:1.2;letter-spacing:-.01em}
 .checks .ico{margin-top:2px}.checks .good{color:var(--ok)}.checks .warn{color:var(--warn)}
 .chip-row{display:flex;gap:.5rem;flex-wrap:wrap}
 
+/* ---------- visitors ---------- */
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.2rem}
+.push{margin-left:auto}
+.switch.compact{font-weight:500;font-size:.88rem}
+.legend{display:flex;gap:.9rem;align-items:center;font-size:.8rem;color:var(--muted)}
+.dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:.3rem}
+.dot.views{background:var(--brand)}.dot.unique{background:#2b2926}
+.chart{display:flex;align-items:flex-end;gap:3px;height:200px;padding-top:.5rem;overflow-x:auto}
+.chart .col{flex:1 0 8px;min-width:8px;display:flex;align-items:flex-end;justify-content:center;gap:1px;height:100%;cursor:default}
+.chart .col i{display:block;width:50%;max-width:18px;border-radius:3px 3px 0 0;min-height:2px}
+.chart .col i.v{background:linear-gradient(180deg,var(--brand-2),var(--brand))}
+.chart .col i.u{background:#2b2926}
+.chart .col:hover{background:#faf6f2}
+.chart-empty{margin:auto;color:var(--muted)}
+.bars{display:grid;gap:.65rem}
+.bar-row{display:grid;gap:.2rem;font-size:.86rem}
+.bar-top{display:flex;justify-content:space-between;gap:.6rem}
+.bar-top span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink);font-weight:500}
+.bar-top span:last-child{color:var(--muted);font-variant-numeric:tabular-nums}
+.bar-track{height:6px;border-radius:99px;background:#f0ede9;overflow:hidden}
+.bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--brand),var(--brand-2))}
+.bar-group{font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:.2rem 0 .6rem}
+.bar-group.gap{margin-top:1.2rem}
+code{background:#f1eeea;padding:.05rem .35rem;border-radius:5px;font-size:.85em}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.86rem}
+
 /* ---------- tables ---------- */
 .toolbar{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem}
 .toolbar select{width:auto;min-width:160px}

@@ -95,7 +95,7 @@ $("#logout").onclick = async () => { try { await call("/api/admin/logout", "POST
 
 /* ---------- navigation ---------- */
 const TITLES = {dashboard: "Dashboard", requests: "Quote requests", quotes: "Instant quotes", products: "Products", categories: "Categories",
-  pricing: "Instant quote pricing", estimator: "STL estimator pricing", materials: "Materials", limits: "Limits & customer text"};
+  visitors: "Visitors", pricing: "Instant quote pricing", estimator: "STL estimator pricing", materials: "Materials", limits: "Limits & customer text"};
 const SETTINGS_VIEWS = new Set(["pricing", "estimator", "materials", "limits"]);
 function route() {
   const name = (location.hash || "#dashboard").slice(1);
@@ -107,6 +107,7 @@ function route() {
   const isSettings = SETTINGS_VIEWS.has(currentView);
   $("#save").hidden = !isSettings; $("#discard").hidden = !isSettings;
   closeMenu(); window.scrollTo(0, 0);
+  if (currentView === "visitors") loadVisits().catch(e => toast(e.message, "bad"));
 }
 window.addEventListener("hashchange", () => { if (!$("#app").hidden) route(); });
 const closeMenu = () => { $("#sidebar").classList.remove("open"); $("#scrim").hidden = true; $("#menuBtn").setAttribute("aria-expanded", "false"); };
@@ -256,6 +257,73 @@ function renderDashboard() {
   clear($("#healthList")).append(...items.map(([ok, text]) => h("li", {}, h("span", {class: ok ? "good" : "warn"}, icon(ok ? "check" : "alert")), text)));
   const badge = $("#navRequests"); badge.hidden = recent === 0; badge.textContent = String(recent);
 }
+
+/* ---------- visitors ---------- */
+let VISITS = null;
+function barRows(el, items, emptyText) {
+  const max = Math.max(1, ...items.map(i => i.count));
+  if (!items.length) { el.append(h("p", {class: "muted small", text: emptyText || "No data yet."})); return; }
+  items.forEach(i => {
+    const fill = h("div", {class: "bar-fill"}); fill.style.width = Math.max(3, i.count / max * 100) + "%";
+    el.append(h("div", {class: "bar-row"}, h("div", {class: "bar-top"}, h("span", {text: i.name, title: i.name}), h("span", {text: money(i.count)})), h("div", {class: "bar-track"}, fill)));
+  });
+}
+function renderVisits() {
+  if (!VISITS) return;
+  const t = VISITS.totals;
+  clear($("#visitKpis")).append(
+    kpi("eye", "Page views", money(t.views), money(t.todayViews) + " today"),
+    kpi("users", "Visits", money(t.visits), "Separate visits (30 min gap)"),
+    kpi("globe", "Unique visitors", money(t.uniqueIps), money(t.todayUnique) + " today · counted by IP address"),
+    kpi("alert", "Bot & crawler hits", money(t.botViews), $("#visitBots").checked ? "Included in the numbers" : "Excluded from the numbers"));
+  const chart = clear($("#visitChart")), maxV = Math.max(1, ...VISITS.daily.map(d => d.views));
+  if (!t.views) chart.append(h("p", {class: "chart-empty", text: "No page views recorded in this period yet."}));
+  else VISITS.daily.forEach(d => {
+    const v = h("i", {class: "v"}), u = h("i", {class: "u"});
+    v.style.height = (d.views / maxV * 100) + "%"; u.style.height = (d.unique / maxV * 100) + "%";
+    const label = new Date(d.date + "T00:00:00").toLocaleDateString("en-LK", {day: "numeric", month: "short"});
+    chart.append(h("div", {class: "col", title: label + ": " + d.views + " views, " + d.visits + " visits, " + d.unique + " unique visitors"}, v, u));
+  });
+  barRows(clear($("#visitPages")), VISITS.pages);
+  barRows(clear($("#visitRefs")), VISITS.referrers, "No referrers yet.");
+  const dev = clear($("#visitDevices"));
+  const d1 = h("div", {class: "bars"}), d2 = h("div", {class: "bars"});
+  dev.append(h("div", {class: "bar-group", text: "Devices"}), d1, h("div", {class: "bar-group gap", text: "Browsers"}), d2);
+  barRows(d1, VISITS.devices); barRows(d2, VISITS.browsers);
+  renderVisitIps();
+  const recent = clear($("#visitRecent"));
+  VISITS.recent.forEach(r => recent.append(h("tr", {},
+    h("td", {}, h("div", {class: "cell-main", text: ago(r.time)}), h("div", {class: "cell-sub", text: stamp(r.time)})),
+    h("td", {class: "mono", text: r.ip}), h("td", {text: r.path}),
+    h("td", {}, r.device + " · " + r.browser + " ", r.bot ? h("span", {class: "badge gray", text: "bot"}) : null),
+    h("td", {class: "cell-sub", text: r.referrer ? r.referrer.replace(/^https?:\/\//, "").slice(0, 40) : "Direct"}))));
+}
+function filteredIps() {
+  const q = $("#visitSearch").value.trim().toLowerCase();
+  return VISITS.ips.filter(v => !q || [v.ip, v.lastPage, v.device, v.browser].join(" ").toLowerCase().includes(q));
+}
+function renderVisitIps() {
+  const rows = filteredIps(), tb = clear($("#visitIpRows"));
+  rows.slice().sort((a, b) => b.visits - a.visits || b.views - a.views).forEach(v => tb.append(h("tr", {},
+    h("td", {class: "mono cell-main", text: v.ip}), h("td", {class: "num cell-main", text: String(v.visits)}), h("td", {class: "num", text: String(v.views)}),
+    h("td", {text: v.lastPage}), h("td", {}, v.device + " · " + v.browser + " ", v.bot ? h("span", {class: "badge gray", text: "bot"}) : null),
+    h("td", {text: stamp(v.first)}), h("td", {}, h("div", {text: ago(v.last)}), h("div", {class: "cell-sub", text: stamp(v.last)})))));
+  $("#visitIpEmpty").hidden = rows.length > 0;
+}
+async function loadVisits() {
+  VISITS = await call("/api/admin/visits?days=" + $("#visitDays").value + ($("#visitBots").checked ? "&bots=1" : ""));
+  renderVisits();
+}
+$("#visitDays").onchange = $("#visitBots").onchange = () => loadVisits().catch(e => toast(e.message, "bad"));
+$("#reloadVisits").onclick = () => loadVisits().then(() => toast("Visitors refreshed.")).catch(e => toast(e.message, "bad"));
+$("#visitSearch").oninput = () => { if (VISITS) renderVisitIps(); };
+$("#exportVisits").onclick = () => {
+  const cell = v => '"' + String(v ?? "").replace(/"/g, '""') + '"';
+  const lines = [["IP address", "Visits", "Page views", "Last page", "Device", "Browser", "First seen", "Last seen"].map(cell).join(",")];
+  filteredIps().forEach(v => lines.push([v.ip, v.visits, v.views, v.lastPage, v.device, v.browser, v.first, v.last].map(cell).join(",")));
+  const a = h("a", {href: URL.createObjectURL(new Blob(["\ufeff" + lines.join("\r\n")], {type: "text/csv;charset=utf-8"})), download: "visitors-" + new Date().toISOString().slice(0, 10) + ".csv"});
+  document.body.append(a); a.click(); a.remove();
+};
 
 /* ---------- quote requests ---------- */
 function filteredRequests() {

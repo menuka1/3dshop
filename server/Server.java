@@ -193,6 +193,7 @@ public class Server {
                 case "POST /api/admin/shop/image" -> { if (admin(ex)) uploadProductImage(ex); }
                 case "GET /api/admin/quotes" -> { if (admin(ex)) recentQuotes(ex); }
                 case "GET /api/admin/quote-requests" -> { if (admin(ex)) recentQuoteRequests(ex); }
+                case "GET /api/admin/visits" -> { if (admin(ex)) adminVisits(ex); }
                 default -> json(ex, 404, err("Not found"));
             }
         } catch (BadRequest e) {
@@ -279,6 +280,7 @@ public class Server {
 
     static void cleanup() {
         long now = System.currentTimeMillis();
+        pruneVisits();
         sessions.entrySet().removeIf(e -> e.getValue()[0] < now || now - e.getValue()[1] > SESSION_IDLE_MS);
         hits.entrySet().removeIf(e -> {
             var q = e.getValue();
@@ -761,6 +763,163 @@ public class Server {
         json(ex, 200, o);
     }
 
+    // =============================== visitor log (page views, shown on the admin Visitors page)
+    static final Object VISIT_LOCK = new Object();
+    static final ZoneId COLOMBO = ZoneId.of("Asia/Colombo");
+    static final long SESSION_GAP_MS = 30 * 60_000L;
+    static volatile LocalDate lastPrune = null;
+    static final Pattern BOT_UA = Pattern.compile("bot|crawl|spider|slurp|preview|facebookexternalhit|headless|curl|wget|python|java/|go-http|monitor|lighthouse|pingdom|uptime|scrapy|httpclient|axios|node-fetch", Pattern.CASE_INSENSITIVE);
+
+    static Path visitsFile() { return DATA.resolve("visits.jsonl"); }
+
+    static String clipTo(String v, int max) { return v == null ? "" : v.length() <= max ? v : v.substring(0, max); }
+
+    /** Records one page view. Never lets a logging problem break the page. */
+    static void trackVisit(HttpExchange ex, String path) {
+        try {
+            if (!ex.getRequestMethod().equals("GET")) return;
+            long[] session = sessions.get(token(ex));
+            if (session != null && session[0] > System.currentTimeMillis()) return;           // do not count the admin browsing the site
+            String purpose = ex.getRequestHeaders().getFirst("Purpose");
+            if (purpose != null && purpose.toLowerCase(Locale.ROOT).contains("prefetch")) return;
+            String ua = clipTo(ex.getRequestHeaders().getFirst("User-Agent"), 220);
+            JsonObject o = new JsonObject();
+            o.addProperty("t", System.currentTimeMillis());
+            o.addProperty("ip", ip(ex));
+            o.addProperty("path", clipTo(path, 200));
+            o.addProperty("ua", ua);
+            o.addProperty("ref", clipTo(ex.getRequestHeaders().getFirst("Referer"), 200));
+            o.addProperty("bot", ua.isBlank() || BOT_UA.matcher(ua).find());
+            synchronized (VISIT_LOCK) {
+                Path f = visitsFile();
+                if (Files.exists(f) && Files.size(f) > 40L * 1024 * 1024) Files.move(f, DATA.resolve("visits-old.jsonl"), StandardCopyOption.REPLACE_EXISTING);
+                Files.writeString(f, COMPACT.toJson(o) + "\n", StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+            }
+        } catch (Exception ignored) { }
+    }
+
+    /** Drops visit records older than visitRetentionDays (default 90), at most once a day. */
+    static void pruneVisits() {
+        LocalDate today = LocalDate.now(COLOMBO);
+        if (today.equals(lastPrune)) return;
+        lastPrune = today;
+        try {
+            int days = Integer.parseInt(CFG.getProperty("visitRetentionDays", "90").trim());
+            long cutoff = System.currentTimeMillis() - days * 86_400_000L;
+            synchronized (VISIT_LOCK) {
+                Path f = visitsFile();
+                if (!Files.exists(f)) return;
+                List<String> keep = new ArrayList<>();
+                for (String line : Files.readAllLines(f, StandardCharsets.UTF_8)) {
+                    try { if (JsonParser.parseString(line).getAsJsonObject().get("t").getAsLong() >= cutoff) keep.add(line); } catch (RuntimeException ignored) { }
+                }
+                Files.write(f, keep, StandardCharsets.UTF_8);
+            }
+        } catch (Exception ignored) { }
+    }
+
+    static String deviceOf(String ua) {
+        String u = ua.toLowerCase(Locale.ROOT);
+        if (u.contains("ipad") || u.contains("tablet")) return "Tablet";
+        if (u.contains("mobi") || u.contains("android") || u.contains("iphone")) return "Mobile";
+        return "Desktop";
+    }
+
+    static String browserOf(String ua) {
+        String u = ua.toLowerCase(Locale.ROOT);
+        if (u.contains("edg/")) return "Edge";
+        if (u.contains("opr/") || u.contains("opera")) return "Opera";
+        if (u.contains("firefox")) return "Firefox";
+        if (u.contains("chrome") || u.contains("crios")) return "Chrome";
+        if (u.contains("safari")) return "Safari";
+        return "Other";
+    }
+
+    static void adminVisits(HttpExchange ex) throws IOException {
+        int days = 30;
+        boolean includeBots = false;
+        String q = ex.getRequestURI().getRawQuery();
+        if (q != null) for (String part : q.split("&")) {
+            if (part.startsWith("days=")) { try { days = Math.max(1, Math.min(365, Integer.parseInt(part.substring(5)))); } catch (NumberFormatException ignored) { } }
+            if (part.equals("bots=1")) includeBots = true;
+        }
+        long now = System.currentTimeMillis(), since = now - days * 86_400_000L;
+        LocalDate today = LocalDate.now(COLOMBO);
+        Map<LocalDate, long[]> daily = new LinkedHashMap<>();                       // views, visits(sessions)
+        Map<LocalDate, Set<String>> dailyIps = new HashMap<>();
+        for (int i = days - 1; i >= 0; i--) daily.put(today.minusDays(i), new long[2]);
+        record Agg(String ip, long[] n, long[] times, String[] lastPage, String[] ua, boolean[] bot) { }
+        Map<String, Agg> ips = new LinkedHashMap<>();
+        Map<String, Long> pages = new HashMap<>(), referrers = new HashMap<>(), devices = new HashMap<>(), browsers = new HashMap<>();
+        Deque<JsonObject> recent = new ArrayDeque<>();
+        long views = 0, visits = 0, botViews = 0;
+        String ownHost = "";
+        try { ownHost = java.net.URI.create(site()).getHost(); } catch (RuntimeException ignored) { }
+        List<String> lines = new ArrayList<>();
+        synchronized (VISIT_LOCK) { if (Files.exists(visitsFile())) lines = Files.readAllLines(visitsFile(), StandardCharsets.UTF_8); }
+        for (String line : lines) {
+            JsonObject o;
+            try { o = JsonParser.parseString(line).getAsJsonObject(); } catch (RuntimeException e) { continue; }
+            long t = o.get("t").getAsLong();
+            if (t < since) continue;
+            boolean bot = o.has("bot") && o.get("bot").getAsBoolean();
+            if (bot) botViews++;
+            if (bot && !includeBots) continue;
+            String ip = str(o, "ip"), path = str(o, "path"), ua = str(o, "ua"), ref = str(o, "ref");
+            Agg a = ips.computeIfAbsent(ip, k -> new Agg(k, new long[2], new long[3], new String[1], new String[1], new boolean[1]));
+            boolean newSession = a.times()[1] == 0 || t - a.times()[1] > SESSION_GAP_MS;
+            a.n()[0]++; if (newSession) a.n()[1]++;
+            if (a.times()[0] == 0) a.times()[0] = t;
+            a.times()[1] = t; a.lastPage()[0] = path; a.ua()[0] = ua; a.bot()[0] = bot;
+            LocalDate d = Instant.ofEpochMilli(t).atZone(COLOMBO).toLocalDate();
+            long[] day = daily.get(d);
+            if (day != null) { day[0]++; if (newSession) day[1]++; dailyIps.computeIfAbsent(d, k -> new HashSet<>()).add(ip); }
+            views++; if (newSession) visits++;
+            pages.merge(path, 1L, Long::sum);
+            devices.merge(deviceOf(ua), 1L, Long::sum);
+            browsers.merge(browserOf(ua), 1L, Long::sum);
+            String refHost = "Direct / unknown";
+            if (!ref.isBlank()) { try { String hst = java.net.URI.create(ref).getHost(); if (hst != null && !hst.equalsIgnoreCase(ownHost) && !hst.equalsIgnoreCase("www." + ownHost) && !hst.equalsIgnoreCase("localhost")) refHost = hst; else refHost = null; } catch (RuntimeException ignored) { } }
+            if (refHost != null) referrers.merge(refHost, 1L, Long::sum);
+            JsonObject r = new JsonObject();
+            r.addProperty("time", Instant.ofEpochMilli(t).toString()); r.addProperty("ip", ip); r.addProperty("path", path);
+            r.addProperty("device", deviceOf(ua)); r.addProperty("browser", browserOf(ua)); r.addProperty("bot", bot);
+            r.addProperty("referrer", ref.isBlank() ? "" : ref);
+            recent.addFirst(r); if (recent.size() > 150) recent.removeLast();
+        }
+        JsonObject out = new JsonObject();
+        JsonObject totals = new JsonObject();
+        totals.addProperty("views", views); totals.addProperty("visits", visits); totals.addProperty("uniqueIps", ips.size()); totals.addProperty("botViews", botViews);
+        totals.addProperty("days", days);
+        long todayViews = daily.get(today)[0];
+        totals.addProperty("todayViews", todayViews); totals.addProperty("todayUnique", dailyIps.getOrDefault(today, Set.of()).size());
+        out.add("totals", totals);
+        JsonArray dailyArr = new JsonArray();
+        daily.forEach((d, v) -> { JsonObject o = new JsonObject(); o.addProperty("date", d.toString()); o.addProperty("views", v[0]); o.addProperty("visits", v[1]); o.addProperty("unique", dailyIps.getOrDefault(d, Set.of()).size()); dailyArr.add(o); });
+        out.add("daily", dailyArr);
+        JsonArray ipArr = new JsonArray();
+        ips.values().stream().sorted((x, y) -> Long.compare(y.times()[1], x.times()[1])).limit(500).forEach(a -> {
+            JsonObject o = new JsonObject();
+            o.addProperty("ip", a.ip()); o.addProperty("views", a.n()[0]); o.addProperty("visits", a.n()[1]);
+            o.addProperty("first", Instant.ofEpochMilli(a.times()[0]).toString()); o.addProperty("last", Instant.ofEpochMilli(a.times()[1]).toString());
+            o.addProperty("lastPage", a.lastPage()[0]); o.addProperty("device", deviceOf(a.ua()[0])); o.addProperty("browser", browserOf(a.ua()[0])); o.addProperty("bot", a.bot()[0]);
+            ipArr.add(o);
+        });
+        out.add("ips", ipArr);
+        out.add("pages", topN(pages, 12)); out.add("referrers", topN(referrers, 10)); out.add("devices", topN(devices, 5)); out.add("browsers", topN(browsers, 6));
+        JsonArray recentArr = new JsonArray(); recent.forEach(recentArr::add);
+        out.add("recent", recentArr);
+        json(ex, 200, out);
+    }
+
+    static JsonArray topN(Map<String, Long> map, int n) {
+        JsonArray arr = new JsonArray();
+        map.entrySet().stream().sorted((a, b) -> Long.compare(b.getValue(), a.getValue())).limit(n).forEach(e -> {
+            JsonObject o = new JsonObject(); o.addProperty("name", e.getKey()); o.addProperty("count", e.getValue()); arr.add(o);
+        });
+        return arr;
+    }
+
     // =============================== admin
     static final int LOGIN_MAX_FAILS = 8;
     static final long LOGIN_WINDOW_MS = 15 * 60_000L;
@@ -1020,6 +1179,7 @@ public class Server {
             case "ico" -> "image/x-icon"; case "webmanifest" -> "application/manifest+json"; default -> "text/plain; charset=utf-8";
         };
         if (ext.equals("html")) {
+            trackVisit(ex, rel.equals("index.html") ? "/" : "/" + rel);
             String html = renderPage(Files.readString(f, StandardCharsets.UTF_8), rel);
             send(ex, 200, type, html.getBytes(StandardCharsets.UTF_8), "public, max-age=0, must-revalidate", true);
             return;
@@ -1313,6 +1473,7 @@ public class Server {
             + "</div></article>"
             + (related.isEmpty() ? "" : "<section class=\"pdp-related\"><h2>More in " + esc(cat) + "</h2><div class=\"grid\">" + gridCards(related, 4) + "</div></section>")
             + "</div>";
+        trackVisit(ex, productPath(product));
         send(ex, 200, "text/html; charset=utf-8", renderPage(shell(title, metaDesc, productPath(product), imageUrl, "product", ldScript(root), true, main), "product").getBytes(StandardCharsets.UTF_8),
                 "public, max-age=0, must-revalidate", true);
     }
@@ -1364,6 +1525,7 @@ public class Server {
         String main = "<div class=\"wrap pdp-wrap\">" + breadcrumbHtml(crumbs) + "<header class=\"cat-head\"><h1>" + esc(heading) + "</h1><p class=\"sub\">" + intro + "</p>" + subs + "</header>"
             + (list.isEmpty() ? "<p class=\"empty\">No products in this category yet. <a href=\"/contact.html\">Ask us to source it</a>.</p>" : "<div class=\"grid\">" + gridCards(list, 100) + "</div>")
             + others + "<p class=\"cat-cta\">Cannot find what you need? <a href=\"/contact.html\">Tell us</a> and we will source it, or <a href=\"/instant-quote.html\">get a free 3D printing quote</a>.</p></div>";
+        trackVisit(ex, canonical);
         send(ex, 200, "text/html; charset=utf-8", renderPage(shell(clip(heading, 45) + " | 3DShop.lk", metaDesc, canonical, null, "website", ldScript(root), !list.isEmpty(), main), "category").getBytes(StandardCharsets.UTF_8),
                 "public, max-age=0, must-revalidate", true);
     }
