@@ -1,6 +1,6 @@
-import * as THREE from "https://unpkg.com/three@0.180.0/build/three.module.js";
-import { STLLoader } from "https://unpkg.com/three@0.180.0/examples/jsm/loaders/STLLoader.js";
-import { OrbitControls } from "https://unpkg.com/three@0.180.0/examples/jsm/controls/OrbitControls.js";
+import * as THREE from "./vendor/three/three.module.js";
+import { STLLoader } from "./vendor/three/STLLoader.js";
+import { OrbitControls } from "./vendor/three/OrbitControls.js";
 
 const MATERIALS = {
   plaPlus: {label: "PLA+"},
@@ -454,6 +454,7 @@ elements.quoteForm.addEventListener("submit", async event => {
   formData.append("phone", elements.quoteForm.elements.phone.value.trim());
   formData.append("material", MATERIALS[elements.material.value].label);
   formData.append("colour", "Not specified");
+  formData.append("website", elements.quoteForm.elements.website ? elements.quoteForm.elements.website.value : "");
   formData.append("details", summary.text);
   parts.forEach(part => formData.append("files", part.file, part.file.name));
   const chat = window.open("about:blank", "_blank");

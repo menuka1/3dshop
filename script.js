@@ -41,22 +41,11 @@ const DEFAULT_PRODUCTS = [
 const CATS = window.SHOP_CATALOG?.categories || DEFAULT_CATS;
 let PRODUCTS = window.SHOP_CATALOG?.products || DEFAULT_PRODUCTS;
 const FEATURED = [1,2,3,4,5]; // printers shown on the home page
-const WORKS = [
-  {img:"gas-detector",t:"Gas Detector Enclosure",d:"Custom housing, blueprint to finished print"},
-  {img:"cup-holder",t:"Cup Holder Organizer",d:"Two cups and a divided tray in one print"},
-  {img:"c-bracket",t:"C-Shaped Bracket",d:"Clean, precise mounting part"},
-  {img:"fan-assembly",t:"Fan Assembly Mount",d:"Multi-part assembly with switch and USB"},
-  {img:"robotic-arm",t:"Hybrid Robotic Arm",d:"Engineered arm with exploded assembly"},
-  {img:"guardian-mask",t:"Ornate Guardian Mask",d:"Detailed decorative sculpture"},
-  {img:"gripper",t:"Mechanical Gripper",d:"Geared gripper with printed parts"},
-  {img:"gauge-pod",t:"Triple Gauge Pod",d:"Dash pod for three gauges"}
-];
 // ========================
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)], fmt=n=>"Rs. "+n.toLocaleString("en-LK");
 const esc=value=>String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
 const page=document.body.dataset.page;
 const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
-const NAV=[["index.html","Home","home"],["services.html","Services","services"],["portfolio.html","Portfolio","portfolio"],["shop.html","Shop","shop"],["instant-quote.html","Instant quote","instant"],["contact.html","Contact & FAQ","contact"]];
 const ICONS={
   "3D Printers":'<svg viewBox="0 0 64 64" aria-hidden="true"><rect x="8" y="6" width="48" height="52" rx="4"/><path d="M8 16h48M20 16v20M44 16v20M20 30h24"/><rect x="24" y="30" width="16" height="6"/><path d="M14 50h36"/></svg>',
   "Filaments":'<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="24"/><circle cx="32" cy="32" r="8"/><path d="M12 22c8 4 32 4 40 0M12 42c8-4 32-4 40 0"/></svg>',
@@ -66,33 +55,10 @@ const ICONS={
   "Tools & Accessories":'<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M8 40l16-16M30 18l16 16-8 8-16-16zM40 10l14 14"/><path d="M12 52h40"/></svg>'
 };
 const pct=p=>p.old?Math.round((p.old-p.price)/p.old*100):0;
+const slug=v=>{let t=String(v||"").normalize("NFKD").replace(/\p{M}/gu,"").toLowerCase().replace(/&/g," and ").replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");if(t.length>70)t=t.slice(0,70).replace(/-+$/,"");return t||"item"};
+const productUrl=p=>`/product/${p.id}-${slug(p.name)}`;
 
-// ---- shared header / footer / cart drawer
-$("#site-header").outerHTML=`<header class="header"><div class="header-in">
-  <a class="brand" href="index.html" aria-label="3DShop.lk home"><img src="images/logo-192.png" alt=""><span>3DShop<em>.lk</em></span></a>
-  <nav class="nav" id="nav" aria-label="Primary">${NAV.map(n=>`<a href="${n[0]}"${n[2]===page?' aria-current="page"':""}>${n[1]}</a>`).join("")}<a class="btn small mobile-only" href="instant-quote.html">Get a free quote</a></nav>
-  <button class="cartbtn" id="openCart" aria-label="Open cart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2.2l2.1 10.2a1.5 1.5 0 0 0 1.5 1.2h8.1a1.5 1.5 0 0 0 1.5-1.1L20 8H6.2"/><circle cx="9.5" cy="19.5" r="1.4"/><circle cx="17" cy="19.5" r="1.4"/></svg><b id="cartCount">0</b></button>
-  <a class="btn small desk-only" href="instant-quote.html">Get a free quote</a>
-  <button class="menubtn" id="menuBtn" aria-label="Menu" aria-expanded="false" aria-controls="nav"><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span></button>
-</div></header>`;
-$("#site-footer").outerHTML=`<footer class="footer"><div class="wrap">
-  <div class="fcols">
-    <div><a class="brand" href="index.html"><img src="images/logo-192.png" alt=""><span>3DShop<em>.lk</em></span></a><p>Tesla Robotics (Pvt) Ltd.</p><p>3D printing and 3D printers in Sri Lanka.</p></div>
-    <div><h4>Pages</h4>${NAV.map(n=>`<a href="${n[0]}">${n[1]}</a>`).join("")}</div>
-    <div><h4>Services</h4><a href="services.html">3D printing</a><a href="services.html#design">3D design</a><a href="instant-quote.html">Free quote</a></div>
-    <div><h4>Contact</h4><a href="tel:${PHONE.replace(/\s/g,"")}">${PHONE}</a><a href="mailto:${EMAIL}">${EMAIL}</a><span>${LOCATION}</span></div>
-  </div>
-  <p class="copy">© ${new Date().getFullYear()} 3DShop.lk. All rights reserved.</p>
-</div></footer>
-<div class="overlay" id="overlay" hidden></div>
-<aside class="drawer" id="drawer" aria-label="Shopping cart" aria-hidden="true">
-  <div class="dhead"><h3>Your cart</h3><button id="closeCart" aria-label="Close cart">Close</button></div>
-  <div class="items" id="items"></div>
-  <div class="dfoot"><div class="total"><span>Total</span><b id="total">Rs. 0</b></div>
-  <a class="btn orange full" id="checkout" href="#" target="_blank" rel="noopener">Order on WhatsApp</a></div>
-</aside>
-<a class="wa" href="https://wa.me/${WHATSAPP}?text=${encodeURIComponent("Hi 3DShop.lk, I have a question")}" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">WhatsApp</a>
-<div class="toast" id="toast" role="status"></div>`;
+// header, footer and cart drawer are rendered by the server (server/templates) so search engines see them
 
 // ---- cart
 let cart=[];try{cart=JSON.parse(localStorage.getItem("cart3d")||"[]")}catch(e){}
@@ -103,7 +69,7 @@ function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");cl
 function renderCart(){
   const n=cart.reduce((a,i)=>a+i.q,0), tot=cart.reduce((a,i)=>a+i.q*prod(i.id).price,0);
   $("#cartCount").textContent=n; $("#total").textContent=fmt(tot);
-  $("#items").innerHTML=cart.length?cart.map(i=>{const p=prod(i.id);return `<div class="item"><b>${p.name}</b><span>${fmt(p.price*i.q)}</span>
+  $("#items").innerHTML=cart.length?cart.map(i=>{const p=prod(i.id);return `<div class="item"><b>${esc(p.name)}</b><span>${fmt(p.price*i.q)}</span>
     <div class="qty"><button data-dec="${i.id}" aria-label="Decrease">−</button>${i.q}<button data-inc="${i.id}" aria-label="Increase">+</button></div>
     <button class="rm" data-rm="${i.id}">Remove</button></div>`}).join(""):"<p>Your cart is empty. Add a product to get started.</p>";
   const lines=cart.map(i=>`${i.q} x ${prod(i.id).name} - ${fmt(prod(i.id).price*i.q)}`);
@@ -116,10 +82,11 @@ const STOCK={in:"In stock",out:"Out of stock",pre:"Pre-order"};
 // Daraz-style card. Optional per-product fields: rating (0-5), reviews (count), sold (count), free (true = "Free delivery")
 const stars=r=>{const f=Math.round(r*2)/2;return [1,2,3,4,5].map(i=>`<i class="${f>=i?"full":f>=i-.5?"half":""}"></i>`).join("")};
 const card=p=>{const d=pct(p);const k=n=>n>=1000?(n/1000).toFixed(1).replace(".0","")+"K":n;const icon=ICONS[p.cat]||ICONS["Tools & Accessories"];
-  return `<article class="card"><div class="thumb${p.img?" has-img":""}">${p.img?`<img src="images/products/${esc(p.img)}" alt="${esc(p.name)}" loading="lazy" width="600" height="600">`:icon}
+  const url=productUrl(p);
+  return `<article class="card"><div class="thumb${p.img?" has-img":""}"><a href="${url}" tabindex="-1" aria-hidden="true">${p.img?`<img src="/images/products/${esc(p.img)}" alt="${esc(p.name)}" loading="lazy" width="600" height="600">`:icon}</a>
   ${p.tags.includes("new")||p.tags.includes("best")?`<span class="ribbon${p.tags.includes("new")?"":" best"}">${p.tags.includes("new")?"New":"Best seller"}</span>`:""}
   ${d?`<span class="off">-${d}%</span>`:""}</div>
-  <div class="body"><h3>${esc(p.name)}</h3>
+  <div class="body"><h3><a href="${url}">${esc(p.name)}</a></h3>
   <div class="price">${fmt(p.price)}</div>
   ${p.old?`<div class="was"><s>${fmt(p.old)}</s><b>-${d}%</b></div>`:""}
   ${p.rating?`<div class="rate"><span class="stars" aria-label="${p.rating} out of 5">${stars(p.rating)}</span>${p.reviews?`<em>(${k(p.reviews)})</em>`:""}${p.sold?`<span class="sold">${k(p.sold)} sold</span>`:""}</div>`:""}
@@ -164,18 +131,17 @@ function initRails(ids){
 
 // ---- home: featured printers (auto-scrolling)
 if($("#featuredRail")){$("#featuredRail").innerHTML=FEATURED.map(id=>prod(id)).filter(Boolean).map(card).join("");initRails(["featuredRail"])}
-const workBtn=w=>`<button class="work" data-img="${w.img}" data-t="${w.t}"><img src="images/${w.img}.webp" alt="${w.t}: CAD blueprint beside the finished 3D-printed part" loading="lazy" width="1000" height="1000"><div><b>${w.t}</b><span>${w.d}</span></div></button>`;
-if($("#teaser"))$("#teaser").innerHTML=WORKS.slice(0,4).map(workBtn).join("");
+
 
 // ---- portfolio gallery + lightbox
-if($("#gallery"))$("#gallery").innerHTML=WORKS.map(workBtn).join("");
+
 if($("#gallery")||$("#teaser")){
   const lb=document.createElement("dialog");lb.className="lb";lb.setAttribute("aria-label","Project image");
   lb.innerHTML='<button aria-label="Close" autofocus>✕</button><img alt=""><p></p>';document.body.append(lb);
   lb.querySelector("button").onclick=()=>lb.close();
   lb.addEventListener("click",e=>{if(e.target===lb)lb.close()});
   document.addEventListener("click",e=>{const w=e.target.closest(".work");if(!w)return;
-    lb.querySelector("img").src="images/"+w.dataset.img+".webp";lb.querySelector("img").alt=w.dataset.t;lb.querySelector("p").textContent=w.dataset.t;lb.showModal()});
+    lb.querySelector("img").src="/images/"+w.dataset.img+".webp";lb.querySelector("img").alt=w.dataset.t;lb.querySelector("p").textContent=w.dataset.t;lb.showModal()});
 }
 
 // ---- shop page
@@ -241,16 +207,8 @@ if($("#grid")){
 }
 
 
-// ---- How it works: animated vector steps
-const HOW=[
-  {t:"Send your model",d:"Share the 3D model you want us to review: STL, OBJ, 3MF or STEP.",svg:'<path class="draw" d="M48 12l26 14v28L48 68 22 54V26z"/><path class="draw" d="M22 26l26 14 26-14M48 40v28"/><g class="bob"><path d="M48 90V78M42 84l6-6 6 6"/></g>'},
-  {t:"Choose preferences",d:"Select your material, colour, layer height, infill and quantity.",svg:'<path class="draw" d="M16 26h64M16 48h64M16 70h64"/><circle class="knob k1" cx="30" cy="26" r="7"/><circle class="knob k2" cx="64" cy="48" r="7"/><circle class="knob k3" cx="44" cy="70" r="7"/>'},
-  {t:"Submit your request",d:"Add your contact details and send the request for review.",svg:'<g class="fly"><path class="draw" d="M12 46L86 14 64 84 46 58z"/><path class="draw" d="M46 58L86 14"/></g>'},
-  {t:"We contact you",d:"We confirm the price with you on WhatsApp, usually within one working day.",svg:'<path class="draw" d="M16 18h64a4 4 0 0 1 4 4v40a4 4 0 0 1-4 4H46L30 82V66H16a4 4 0 0 1-4-4V22a4 4 0 0 1 4-4z"/><path class="tick" d="M34 42l10 10 20-20"/>'}
-];
+// ---- How it works: steps are static HTML; animate them in when scrolled into view
 if($("#how-steps")){
-  $("#how-steps").className="how";
-  $("#how-steps").innerHTML=HOW.map((h,i)=>`<div class="how-step" style="--i:${i}"><div class="how-icon"><span class="how-num">${i+1}</span><svg viewBox="0 0 96 96" aria-hidden="true">${h.svg}</svg></div><h3>${h.t}</h3><p>${h.d}</p></div>`).join("");
   if("IntersectionObserver" in window){
     const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}}),{threshold:.25});
     io.observe($("#how-steps"));
@@ -289,6 +247,14 @@ if($("#quoteForm"))$("#quoteForm").onsubmit=async e=>{
     note.textContent=error.message;
   }finally{button.disabled=false}
 };
+
+// ---- quote page: pre-fill from ?type= and ?estimate=
+if($("#quoteForm")){
+  const qp=new URLSearchParams(location.search);
+  if(qp.get("type")==="design")$("#typeSel").value="Design and print";
+  const est=qp.get("estimate");
+  if(est)$('#quoteForm [name="details"]').value=est;
+}
 
 // ---- contact page details
 $$("[data-phone]").forEach(a=>{a.textContent=PHONE;a.href="tel:"+PHONE.replace(/\s/g,"")});

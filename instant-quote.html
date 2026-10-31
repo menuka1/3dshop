@@ -3,17 +3,34 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Instant 3D Print Price – Upload your STL | 3DShop.lk</title>
-<meta name="description" content="Upload your STL file and see the 3D printing price in rupees instantly. Choose material, colour and quantity, then order on WhatsApp.">
-<link rel="icon" href="images/logo-192.png">
+<title>Instant 3D Printing Price Estimate – Upload STL | 3DShop.lk</title>
+<meta name="description" content="Upload your STL file, preview it in 3D and get a 3D printing price estimate in Sri Lankan rupees. Then request a final quote.">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<link rel="canonical" href="{{SITE}}/instant-quote.html">
+<meta name="theme-color" content="#F26F21">
+<link rel="icon" href="/images/logo-192.png" type="image/png">
+<link rel="apple-touch-icon" href="/images/logo-192.png">
+<meta property="og:site_name" content="3DShop.lk">
+<meta property="og:locale" content="en_LK">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Instant 3D Printing Price Estimate – Upload STL | 3DShop.lk">
+<meta property="og:description" content="Upload your STL file, preview it in 3D and get a 3D printing price estimate in Sri Lankan rupees. Then request a final quote.">
+<meta property="og:url" content="{{SITE}}/instant-quote.html">
+<meta property="og:image" content="{{SITE}}/images/hero-cad-to-real.webp">
+<meta property="og:image:alt" content="CAD blueprint of an electronic device turning into the finished 3D-printed device">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Instant 3D Printing Price Estimate – Upload STL | 3DShop.lk">
+<meta name="twitter:description" content="Upload your STL file, preview it in 3D and get a 3D printing price estimate in Sri Lankan rupees. Then request a final quote.">
+<meta name="twitter:image" content="{{SITE}}/images/hero-cad-to-real.webp">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"{{SITE}}/"},{"@type":"ListItem","position":2,"name":"Instant quote"}]}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&display=swap">
-<link rel="stylesheet" href="style.css?v=quote-dialog-2">
+<link rel="stylesheet" href="style.css">
 </head>
 <body data-page="instant">
 <a class="skip" href="#main">Skip to main content</a>
-<div id="site-header"></div>
+<!--#header-->
 
 <main id="main">
   <section class="page-hero">
@@ -104,6 +121,7 @@
     </div>
     <label>Name<input name="name" required maxlength="120" autocomplete="name"></label>
     <label>WhatsApp number<input name="phone" required maxlength="60" inputmode="tel" autocomplete="tel"></label>
+    <label class="hp" aria-hidden="true">Leave this empty<input name="website" tabindex="-1" autocomplete="off"></label>
     <p class="est-dialog-status" id="quoteRequestStatus" role="status"></p>
     <div class="est-actions est-dialog-actions">
       <button class="btn ghost-dark" type="button" id="cancelQuoteRequest">Cancel</button>
@@ -112,9 +130,8 @@
   </form>
 </dialog>
 
-<div id="site-footer"></div>
-<script src="script.js?v=business-contact-1"></script>
-<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.180.0/build/three.module.js"}}</script>
-<script type="module" src="stl-estimate.js?v=stl-estimate-7"></script>
+<!--#footer-->
+<script src="script.js"></script>
+<script type="module" src="stl-estimate.js"></script>
 </body>
 </html>

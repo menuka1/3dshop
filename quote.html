@@ -3,9 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Get a Free 3D Printing Quote – 3DShop.lk</title>
-<meta name="description" content="Request a free quote for 3D printing or 3D design in Sri Lanka. We reply on WhatsApp.">
-<link rel="icon" href="images/logo-192.png">
+<title>Free 3D Printing &amp; 3D Modeling Quote – Sri Lanka | 3DShop.lk</title>
+<meta name="description" content="Request a free quote for 3D printing or 3D modeling in Sri Lanka. Attach your model or sketch and we reply on WhatsApp.">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<link rel="canonical" href="{{SITE}}/quote.html">
+<meta name="theme-color" content="#F26F21">
+<link rel="icon" href="/images/logo-192.png" type="image/png">
+<link rel="apple-touch-icon" href="/images/logo-192.png">
+<meta property="og:site_name" content="3DShop.lk">
+<meta property="og:locale" content="en_LK">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Free 3D Printing &amp; 3D Modeling Quote – Sri Lanka | 3DShop.lk">
+<meta property="og:description" content="Request a free quote for 3D printing or 3D modeling in Sri Lanka. Attach your model or sketch and we reply on WhatsApp.">
+<meta property="og:url" content="{{SITE}}/quote.html">
+<meta property="og:image" content="{{SITE}}/images/hero-cad-to-real.webp">
+<meta property="og:image:alt" content="CAD blueprint of an electronic device turning into the finished 3D-printed device">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Free 3D Printing &amp; 3D Modeling Quote – Sri Lanka | 3DShop.lk">
+<meta name="twitter:description" content="Request a free quote for 3D printing or 3D modeling in Sri Lanka. Attach your model or sketch and we reply on WhatsApp.">
+<meta name="twitter:image" content="{{SITE}}/images/hero-cad-to-real.webp">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"{{SITE}}/"},{"@type":"ListItem","position":2,"name":"Free quote"}]}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&display=swap">
@@ -13,7 +30,7 @@
 </head>
 <body data-page="quote">
 <a class="skip" href="#main">Skip to main content</a>
-<div id="site-header"></div>
+<!--#header-->
 
 <main id="main">
   <section class="page-hero">
@@ -53,6 +70,7 @@
           <input type="file" name="files" multiple accept=".stl,.obj,.3mf,.step,.stp,.pdf,.png,.jpg,.jpeg,.webp">
           <small>STL, OBJ, 3MF, STEP, PDF, PNG, JPG or WEBP. Up to 5 files, 50 MB each; 100 MB total.</small>
         </label>
+        <label class="hp" aria-hidden="true">Leave this empty<input name="website" tabindex="-1" autocomplete="off"></label>
         <button class="btn orange" type="submit">Submit quote request</button>
         <p class="note" id="quoteNote" role="status"></p>
       </form>
@@ -60,13 +78,7 @@
   </section>
 </main>
 
-<div id="site-footer"></div>
-<script src="script.js?v=business-contact-1"></script>
-<script>
-const quoteParams = new URLSearchParams(location.search);
-if (quoteParams.get("type") === "design") document.getElementById("typeSel").value = "Design and print";
-const estimateText = quoteParams.get("estimate");
-if (estimateText) document.querySelector('#quoteForm [name="details"]').value = estimateText;
-</script>
+<!--#footer-->
+<script src="script.js"></script>
 </body>
 </html>
