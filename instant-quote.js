@@ -114,7 +114,7 @@ const API_BASE = "";
       $("#unit").textContent = qty > 1 ? `${lkr(r.unitLkr)} each · ${qty} pcs` : "";
       $("#note").textContent = `${r.note} Valid for ${r.validityHours} hours.`;
       $("#ref").textContent = "Quote ref: " + r.ref; $("#ref").hidden = false;
-      const msg = `Hi 3DShop.lk, I would like to order a 3D print.\nQuote ref: ${r.ref}\nFile: ${state.file.fileName}\nMaterial: ${state.mat.name}\nColour: ${state.col.name}\nQuantity: ${qty}\nEstimated price: ${lkr(r.totalLkr)}\n(I will attach my model file in this chat.)`;
+      const msg = `Hi 3DSHOP.LK, I would like to order a 3D print.\nQuote ref: ${r.ref}\nFile: ${state.file.fileName}\nMaterial: ${state.mat.name}\nColour: ${state.col.name}\nQuantity: ${qty}\nEstimated price: ${lkr(r.totalLkr)}\n(I will attach my model file in this chat.)`;
       const b = $("#orderBtn"); b.href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`; b.hidden = false;
     } catch (e) {
       if (my !== seq) return;

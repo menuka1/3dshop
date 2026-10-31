@@ -474,7 +474,7 @@ elements.quoteForm.addEventListener("submit", async event => {
     link.href = whatsappUrl; link.target = "_blank"; link.rel = "noopener"; link.textContent = "Continue to WhatsApp";
     elements.quoteResult.append(link);
     elements.quoteResult.hidden = false;
-    setStatus(`Quote request ${result.ref} sent to 3DShop.lk.`);
+    setStatus(`Quote request ${result.ref} sent to 3DSHOP.LK.`);
   } catch (error) {
     if (chat) chat.close();
     elements.quoteStatus.textContent = error.message;

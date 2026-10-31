@@ -73,7 +73,7 @@ function renderCart(){
     <div class="qty"><button data-dec="${i.id}" aria-label="Decrease">−</button>${i.q}<button data-inc="${i.id}" aria-label="Increase">+</button></div>
     <button class="rm" data-rm="${i.id}">Remove</button></div>`}).join(""):"<p>Your cart is empty. Add a product to get started.</p>";
   const lines=cart.map(i=>`${i.q} x ${prod(i.id).name} - ${fmt(prod(i.id).price*i.q)}`);
-  $("#checkout").href=cart.length?`https://wa.me/${WHATSAPP}?text=${encodeURIComponent("Hi 3DShop.lk, I'd like to order:\n"+lines.join("\n")+"\nTotal: "+fmt(tot))}`:"#";
+  $("#checkout").href=cart.length?`https://wa.me/${WHATSAPP}?text=${encodeURIComponent("Hi 3DSHOP.LK, I'd like to order:\n"+lines.join("\n")+"\nTotal: "+fmt(tot))}`:"#";
   save();
 }
 const toggleCart=o=>{$("#drawer").classList.toggle("open",o);$("#drawer").setAttribute("aria-hidden",!o);$("#overlay").hidden=!o};

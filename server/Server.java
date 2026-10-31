@@ -29,7 +29,7 @@ import java.util.concurrent.*;
 import java.util.regex.*;
 
 /**
- * 3DShop.lk quote server.
+ * 3DSHOP.LK quote server.
  * Run from the 3dshop folder:   java -cp "server/lib/*" server/Server.java
  * Secrets live ONLY in server/config.properties and server/keys/ - never in the website files.
  */
@@ -132,7 +132,7 @@ public class Server {
         String adminPw = System.getenv().getOrDefault("ADMIN_PASSWORD", CFG.getProperty("adminPassword", ""));
         if (adminPw.length() < 12) System.err.println("WARNING: admin password is shorter than 12 characters - admin login is DISABLED until you set a longer one.");
         if (!Boolean.parseBoolean(CFG.getProperty("cookieSecure", "false"))) System.err.println("NOTE: cookieSecure=false. Set it to true once the site is served over HTTPS.");
-        System.out.println("3DShop server on http://localhost:" + port + "  (admin: /admin)");
+        System.out.println("3DSHOP.LK server on http://localhost:" + port + "  (admin: /admin)");
     }
 
     static void initJlc() throws IOException {
@@ -1411,7 +1411,7 @@ public class Server {
             + "<meta name=\"robots\" content=\"" + (index ? "index, follow, max-image-preview:large, max-snippet:-1" : "noindex, follow") + "\">\n"
             + "<link rel=\"canonical\" href=\"" + esc(url) + "\">\n<meta name=\"theme-color\" content=\"#F26F21\">\n"
             + "<link rel=\"icon\" href=\"/images/logo-192.png\" type=\"image/png\">\n<link rel=\"apple-touch-icon\" href=\"/images/logo-192.png\">\n"
-            + "<meta property=\"og:site_name\" content=\"3DShop.lk\">\n<meta property=\"og:locale\" content=\"en_LK\">\n<meta property=\"og:type\" content=\"" + ogType + "\">\n"
+            + "<meta property=\"og:site_name\" content=\"3DSHOP.LK\">\n<meta property=\"og:locale\" content=\"en_LK\">\n<meta property=\"og:type\" content=\"" + ogType + "\">\n"
             + "<meta property=\"og:title\" content=\"" + esc(title) + "\">\n<meta property=\"og:description\" content=\"" + esc(desc) + "\">\n"
             + "<meta property=\"og:url\" content=\"" + esc(url) + "\">\n<meta property=\"og:image\" content=\"" + esc(image) + "\">\n"
             + "<meta name=\"twitter:card\" content=\"summary_large_image\">\n<meta name=\"twitter:title\" content=\"" + esc(title) + "\">\n<meta name=\"twitter:description\" content=\"" + esc(desc) + "\">\n<meta name=\"twitter:image\" content=\"" + esc(image) + "\">\n"
@@ -1433,7 +1433,7 @@ public class Server {
         String name = str(product, "name"), cat = str(product, "cat"), sub = str(product, "sub"), desc = str(product, "desc"), img = str(product, "img"), stock = str(product, "stock");
         double price = number(product, "price"), old = product.has("old") ? number(product, "old") : 0;
         String imageUrl = img.isBlank() ? site() + "/images/logo-192.png" : site() + "/images/products/" + img;
-        String title = clip(name, 42) + " | Buy in Sri Lanka – 3DShop.lk";
+        String title = clip(name, 42) + " | Buy in Sri Lanka – 3DSHOP.LK";
         String metaDesc = clip((desc.isBlank() ? name + "." : desc.endsWith(".") ? desc : desc + ".") + " Buy " + name + " in Sri Lanka for " + rupees(price) + ". Island-wide delivery, order on WhatsApp.", 158);
 
         String[][] crumbs = sub.isBlank()
@@ -1448,7 +1448,7 @@ public class Server {
         offer.addProperty("priceCurrency", "LKR"); offer.addProperty("price", String.format(Locale.US, "%.2f", price));
         offer.addProperty("itemCondition", "https://schema.org/NewCondition");
         offer.addProperty("availability", stock.equals("in") ? "https://schema.org/InStock" : stock.equals("pre") ? "https://schema.org/PreOrder" : "https://schema.org/OutOfStock");
-        JsonObject seller = new JsonObject(); seller.addProperty("@type", "Organization"); seller.addProperty("name", "3DShop.lk"); offer.add("seller", seller);
+        JsonObject seller = new JsonObject(); seller.addProperty("@type", "Organization"); seller.addProperty("name", "3DSHOP.LK"); offer.add("seller", seller);
         ld.add("offers", offer);
         JsonArray graph = new JsonArray(); graph.add(ld); graph.add(breadcrumbLd(crumbs));
         JsonObject root = new JsonObject(); root.addProperty("@context", "https://schema.org"); root.add("@graph", graph);
@@ -1479,7 +1479,7 @@ public class Server {
     }
 
     static final Map<String, String> CATEGORY_INTRO = Map.of(
-        "3D Printers", "Looking to buy a 3D printer in Sri Lanka? Browse FDM and resin 3D printers from 3DShop.lk. We run 3D printers every day in our own print shop, so we can help you choose a machine that suits your parts, materials and budget &ndash; and help you set it up on WhatsApp.",
+        "3D Printers", "Looking to buy a 3D printer in Sri Lanka? Browse FDM and resin 3D printers from 3DSHOP.LK. We run 3D printers every day in our own print shop, so we can help you choose a machine that suits your parts, materials and budget &ndash; and help you set it up on WhatsApp.",
         "Filaments", "Buy 3D printer filament in Sri Lanka: PLA, PLA+, PETG, ABS and flexible TPU on 1 kg and 500 g spools, priced in rupees with island-wide delivery. The same filament types we use in our own printing service.",
         "Resins", "Shop resin for LCD and DLP resin 3D printers in Sri Lanka, from standard grey resin for detailed models to tough engineering resin for functional parts.",
         "Printer Parts", "3D printer parts and upgrades in Sri Lanka: brass nozzles, all-metal hotends, flexible build plates and more for FDM printers.",
@@ -1505,7 +1505,7 @@ public class Server {
         for (JsonObject pr : allProducts()) if (str(pr, "cat").equals(cat) && (sub == null || str(pr, "sub").equals(sub))) list.add(pr);
         String heading = sub == null ? "Buy " + cat + " in Sri Lanka" : "Buy " + sub + " " + cat + " in Sri Lanka";
         String canonical = "/category/" + slug(cat) + (sub == null ? "" : "/" + slug(sub));
-        String intro = CATEGORY_INTRO.getOrDefault(cat, "Shop " + esc(cat) + " at 3DShop.lk. Prices in rupees, island-wide delivery and local support on WhatsApp.");
+        String intro = CATEGORY_INTRO.getOrDefault(cat, "Shop " + esc(cat) + " at 3DSHOP.LK. Prices in rupees, island-wide delivery and local support on WhatsApp.");
         String metaDesc = clip(intro.replaceAll("&ndash;", "-").replaceAll("<[^>]+>", "") + " " + list.size() + " products, island-wide delivery.", 158);
         String[][] crumbs = sub == null ? new String[][]{{"Home", "/"}, {"Shop", "/shop.html"}, {cat, canonical}}
                 : new String[][]{{"Home", "/"}, {"Shop", "/shop.html"}, {cat, "/category/" + slug(cat)}, {sub, canonical}};
@@ -1526,7 +1526,7 @@ public class Server {
             + (list.isEmpty() ? "<p class=\"empty\">No products in this category yet. <a href=\"/contact.html\">Ask us to source it</a>.</p>" : "<div class=\"grid\">" + gridCards(list, 100) + "</div>")
             + others + "<p class=\"cat-cta\">Cannot find what you need? <a href=\"/contact.html\">Tell us</a> and we will source it, or <a href=\"/instant-quote.html\">get a free 3D printing quote</a>.</p></div>";
         trackVisit(ex, canonical);
-        send(ex, 200, "text/html; charset=utf-8", renderPage(shell(clip(heading, 45) + " | 3DShop.lk", metaDesc, canonical, null, "website", ldScript(root), !list.isEmpty(), main), "category").getBytes(StandardCharsets.UTF_8),
+        send(ex, 200, "text/html; charset=utf-8", renderPage(shell(clip(heading, 45) + " | 3DSHOP.LK", metaDesc, canonical, null, "website", ldScript(root), !list.isEmpty(), main), "category").getBytes(StandardCharsets.UTF_8),
                 "public, max-age=0, must-revalidate", true);
     }
 

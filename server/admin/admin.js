@@ -103,7 +103,7 @@ function route() {
   $$(".view").forEach(v => v.hidden = v.id !== "view-" + currentView);
   $$(".side-nav a").forEach(a => a.dataset.nav === currentView ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"));
   $("#viewTitle").textContent = TITLES[currentView];
-  document.title = TITLES[currentView] + " – 3DShop.lk Admin";
+  document.title = TITLES[currentView] + " – 3DSHOP.LK Admin";
   const isSettings = SETTINGS_VIEWS.has(currentView);
   $("#save").hidden = !isSettings; $("#discard").hidden = !isSettings;
   closeMenu(); window.scrollTo(0, 0);
@@ -351,7 +351,7 @@ function openRequest(r) {
   clear($("#requestDetail")).append(h("dl", {class: "detail-grid"},
     row("Received", stamp(r.time)), row("Name", r.name), row("Phone / WhatsApp", r.phone), row("Request type", r.type),
     row("Material", r.material || "-"), row("Colour", r.colour || "-"), row("Details", r.details), row("Files", files)));
-  $("#requestWhatsapp").href = waLink(r.phone, `Hi ${r.name}, this is 3DShop.lk about your quote request ${r.ref}.`);
+  $("#requestWhatsapp").href = waLink(r.phone, `Hi ${r.name}, this is 3DSHOP.LK about your quote request ${r.ref}.`);
   $("#requestDialog").showModal();
 }
 async function loadRequests() { REQUESTS = await call("/api/admin/quote-requests"); renderRequests(); renderDashboard(); }
@@ -430,7 +430,7 @@ function updateSerp() {
   const id = editingProduct ? editingProduct.id : "new";
   $("#serpUrl").textContent = `3dshop.lk › product › ${id}-${slug(name)}`;
   const t = name.length > 42 ? name.slice(0, 41).replace(/\s+\S*$/, "") + "…" : name;
-  $("#serpTitle").textContent = t + " | Buy in Sri Lanka – 3DShop.lk";
+  $("#serpTitle").textContent = t + " | Buy in Sri Lanka – 3DSHOP.LK";
   const price = Number($("#productPrice").value);
   const d = (desc ? (/[.!?]$/.test(desc) ? desc : desc + ".") : name + ".") + " Buy " + name + " in Sri Lanka" + (price > 0 ? " for " + rs(price) : "") + ". Island-wide delivery, order on WhatsApp.";
   $("#serpDesc").textContent = d.length > 158 ? d.slice(0, 157).replace(/\s+\S*$/, "") + "…" : d;
